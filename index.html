@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Student Research Project Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+            transition: transform 0.25s ease;
+        }
+        /* Custom scrollbar for modal content */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Medical Student Research Opportunities</h1>
+            <p class="mt-2 text-md text-gray-600">Browse available projects and submit your application.</p>
+        </header>
+
+        <!-- Search and Filter Controls -->
+        <div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="text" id="searchInput" placeholder="Search by title, faculty, or description..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 md:col-span-1">
+                <select id="typeFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Project Types</option>
+                    <option value="Research">Research</option>
+                    <option value="QI">QI</option>
+                    <option value="Education / Research">Education / Research</option>
+                    <option value="Clinical Trial">Clinical Trial</option>
+                    <option value="Other">Other</option>
+                </select>
+                <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Planned">Planned</option>
+                    <option value="Completed">Completed</option>
+                    <option value="On Hold">On Hold</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Project Listings Table -->
+        <div class="bg-white shadow-md rounded-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Title</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Faculty Lead(s)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participants (Residents/Students)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[350px]">Description</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Slots</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="project-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Project rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+             <div id="no-results" class="hidden text-center p-8 text-gray-500">
+                <h3 class="text-xl font-semibold">No projects found</h3>
+                <p>Try adjusting your search or filter criteria.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign-up Modal -->
+    <div id="signupModal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden opacity-0">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-3xl flex flex-col transform -translate-y-10" style="max-height: 90vh;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Medical Student Research Application</h2>
+                    <p class="text-sm text-blue-700 font-semibold" id="modalProjectTitle"></p>
+                </div>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-800 text-3xl font-light">&times;</button>
+            </div>
+            <form id="signupForm" class="modal-body overflow-y-auto p-6 space-y-6">
+                <input type="hidden" id="projectTitleInput" name="projectTitle">
+                
+                <!-- Personal Information -->
+                <fieldset class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label for="name" class="block text-sm font-medium text-gray-700">Full Name</label><input type="text" id="name" name="name" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="email" class="block text-sm font-medium text-gray-700">Email Address</label><input type="email" id="email" name="email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="phone" class="block text-sm font-medium text-gray-700">Phone</label><input type="tel" id="phone" name="phone" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="schoolYear" class="block text-sm font-medium text-gray-700">School and Year</label><input type="text" id="schoolYear" name="schoolYear" placeholder="e.g., UC Davis, MS2" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="hours" class="block text-sm font-medium text-gray-700">Available Hours/Week</label><input type="text" id="hours" name="hours" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="duration" class="block text-sm font-medium text-gray-700">Preferred Duration</label><input type="text" id="duration" name="duration" placeholder="e.g., 3 months" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="date" class="block text-sm font-medium text-gray-700">Today's Date</label><input type="date" id="date" name="date" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50"></div>
+                    </div>
+                </fieldset>
+                
+                <!-- Academic and Career Goals -->
+                <fieldset class="border-t pt-4">
+                    <legend class="text-lg font-semibold text-gray-800 mb-2">Academic and Career Goals</legend>
+                    <div class="space-y-4">
+                        <div><label for="specialty" class="block text-sm font-medium text-gray-700">Intended specialty</label><input type="text" id="specialty" name="specialty" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></div>
+                        <div><label for="longTermGoals" class="block text-sm font-medium text-gray-700">Long-term goals (e.g., match strategy, publication, presentation)</label><textarea id="longTermGoals" name="longTermGoals" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                    </div>
+                </fieldset>
+
+                <!-- Past Experience -->
+                <fieldset class="border-t pt-4">
+                    <legend class="text-lg font-semibold text-gray-800 mb-2">Past Experience</legend>
+                    <div class="space-y-4">
+                        <div><label for="clinicalResearch" class="block text-sm font-medium text-gray-700">Clinical research</label><textarea id="clinicalResearch" name="clinicalResearch" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                        <div><label for="qiAudit" class="block text-sm font-medium text-gray-700">QI or audit</label><textarea id="qiAudit" name="qiAudit" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                        <div><label for="techSkills" class="block text-sm font-medium text-gray-700">Technical skills (e.g., Python, R, stats, survey tools)</label><textarea id="techSkills" name="techSkills" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                        <div><label for="publications" class="block text-sm font-medium text-gray-700">Prior presentations/publications (if any)</label><textarea id="publications" name="publications" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                    </div>
+                </fieldset>
+
+                <!-- Project Preferences -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                    <fieldset>
+                        <legend class="text-lg font-semibold text-gray-800 mb-2">Project Preferences</legend>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="checkbox" id="topic_airway" name="topics" value="Airway" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_airway" class="ml-2 text-sm text-gray-700">Airway</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="topic_pacu" name="topics" value="PACU" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_pacu" class="ml-2 text-sm text-gray-700">PACU</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="topic_neuro" name="topics" value="Neurology/neuroanesthesia" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_neuro" class="ml-2 text-sm text-gray-700">Neurology/neuroanesthesia</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="topic_ai" name="topics" value="AI/data science" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_ai" class="ml-2 text-sm text-gray-700">AI/data science</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="topic_curriculum" name="topics" value="Curriculum development" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_curriculum" class="ml-2 text-sm text-gray-700">Curriculum development</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="topic_equity" name="topics" value="Health equity" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="topic_equity" class="ml-2 text-sm text-gray-700">Health equity</label></div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend class="text-lg font-semibold text-gray-800 mb-2">Preferred Deliverables</legend>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="checkbox" id="deliverable_poster" name="deliverables" value="Poster" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="deliverable_poster" class="ml-2 text-sm text-gray-700">Poster</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="deliverable_abstract" name="deliverables" value="Abstract" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="deliverable_abstract" class="ml-2 text-sm text-gray-700">Abstract</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="deliverable_manuscript" name="deliverables" value="Manuscript" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="deliverable_manuscript" class="ml-2 text-sm text-gray-700">Manuscript</label></div>
+                            <div class="flex items-center"><input type="checkbox" id="deliverable_tool" name="deliverables" value="Tool/curriculum" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"><label for="deliverable_tool" class="ml-2 text-sm text-gray-700">Tool/curriculum</label></div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- Working Style -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                    <fieldset>
+                        <legend class="text-lg font-semibold text-gray-800 mb-2">Supervision Preference</legend>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="supervision_weekly" name="supervision" value="Weekly meetings" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"><label for="supervision_weekly" class="ml-2 text-sm text-gray-700">Weekly meetings</label></div>
+                            <div class="flex items-center"><input type="radio" id="supervision_occasional" name="supervision" value="Occasional check-ins" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"><label for="supervision_occasional" class="ml-2 text-sm text-gray-700">Occasional check-ins</label></div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend class="text-lg font-semibold text-gray-800 mb-2">Collaboration Preference</legend>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="collab_solo" name="collaboration" value="Solo project" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"><label for="collab_solo" class="ml-2 text-sm text-gray-700">Solo project</label></div>
+                            <div class="flex items-center"><input type="radio" id="collab_paired" name="collaboration" value="Paired project" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"><label for="collab_paired" class="ml-2 text-sm text-gray-700">Paired project</label></div>
+                            <div class="flex items-center"><input type="radio" id="collab_team" name="collaboration" value="Larger team" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"><label for="collab_team" class="ml-2 text-sm text-gray-700">Larger team</label></div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- Form Submission -->
+                <div class="flex justify-end pt-4 border-t">
+                    <button type="button" id="cancelButton" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors mr-3">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Success Message Box -->
+    <div id="successMessage" class="fixed top-5 right-5 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg hidden" role="alert">
+      <strong class="font-bold">Success!</strong>
+      <span class="block sm:inline">Your application has been submitted.</span>
+    </div>
+
+
+<script>
+    // Combined and standardized project data
+    const projectData = [
+        { "Project Title": "AI-PACU Study: Clinical Decision Support for Discharge & Escalation", "Faculty Lead(s)": "Brian Pitts, MD, MS", "Participants": "Seeking medical students", "Project Type": "Research", "Brief Description": "Develop and evaluate an AI tool to assist PACU nurses in escalation and discharge decisions.", "Skills / Experience Needed": "Basic EHR navigation; optional Python/R skills", "Time Commitment": "2–4 hrs/week", "Open Slots": 2, "Status": "Planned" },
+        { "Project Title": "Stroke Thrombectomy Anesthesia Protocol", "Faculty Lead(s)": "Brian Pitts, MD, MS; Christian Bohringer, MD", "Participants": "1 Resident", "Project Type": "QI", "Brief Description": "Streamline anesthesia protocols for mechanical thrombectomy to improve outcomes and reduce delays.", "Skills / Experience Needed": "None; interest in neuroanesthesia helpful", "Time Commitment": "2 hrs/week", "Open Slots": 1, "Status": "Active" },
+        { "Project Title": "BranchLab: Physiologic Airway Simulation", "Faculty Lead(s)": "Brian Pitts, MD, MS", "Participants": "Seeking students/residents", "Project Type": "Education / Research", "Brief Description": "Develop web-based, case-driven simulation to train residents in physiologic airway management.", "Skills / Experience Needed": "None; web dev or UI/UX skills a plus", "Time Commitment": "Flexible", "Open Slots": 3, "Status": "Active" },
+        { "Project Title": "Pediatric Anesthesia Safety Dashboard", "Faculty Lead(s)": "Faculty Lead TBD", "Participants": "Seeking medical students", "Project Type": "QI", "Brief Description": "Create a real-time dashboard of perioperative safety metrics for pediatric anesthesia.", "Skills / Experience Needed": "Data analytics skills preferred", "Time Commitment": "2–4 hrs/week", "Open Slots": 2, "Status": "Planned" },
+        { "Project Title": "EVD Safety Campaign", "Faculty Lead(s)": "Faculty Lead TBD", "Participants": "1 Medical Student", "Project Type": "QI", "Brief Description": "Improve external ventricular drain (EVD) insertion and management safety.", "Skills / Experience Needed": "None", "Time Commitment": "1–2 hrs/week", "Open Slots": 1, "Status": "On Hold" },
+        { "Project Title": "The Analgesic Museum", "Faculty Lead(s)": "Ian Koebner, Ph.D.", "Participants": "N/A", "Project Type": "Research", "Brief Description": "Development and effectiveness of museum-based experiences to reduce social isolation and pain.", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 0, "Status": "Completed" },
+        { "Project Title": "ARTRX01: Arts-engagement for Chronic Pain", "Faculty Lead(s)": "Ian Koebner, Ph.D.", "Participants": "Seeking participants", "Project Type": "Research", "Brief Description": "Feasibility, acceptability, and effect of Arts-engagement for individuals with Chronic Pain.", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 1, "Status": "Active" },
+        { "Project Title": "SedLine vs Comparator Device", "Faculty Lead(s)": "Richard L. Applegate ll, M.D.; Neal Fleming, M.D., Ph.D.; James Jones, M.D.", "Participants": "Seeking participants", "Project Type": "Clinical Trial", "Brief Description": "Comparison of Depth of Sedation Performance between SedLine and Comparator Device during General Anesthesia.", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 0, "Status": "Completed" },
+        { "Project Title": "EEG Data in Critically Ill Patients", "Faculty Lead(s)": "Richard L. Applegate II, M.D.; Neal Fleming, M.D., Ph.D.", "Participants": "Seeking participants", "Project Type": "Research", "Brief Description": "EEG Data Collection in Critically Ill Patients (APPL0008).", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 1, "Status": "Active" },
+        { "Project Title": "Analgesia after shoulder surgery", "Faculty Lead(s)": "Robin Aldwinckle, B.M.B.S.; Richard L Applegate II, M.D.", "Participants": "Seeking participants", "Project Type": "Research", "Brief Description": "Patient self reported duration of analgesia after shoulder surgery and interscalene block.", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 1, "Status": "Active" },
+        { "Project Title": "Dynamic monitors for volume responsiveness", "Faculty Lead(s)": "Neal Fleming, M.D., Ph.D.", "Participants": "Esha Lal, Anastasiia Zhelokhovtseva", "Project Type": "Research", "Brief Description": "Evaluation of dynamic monitors for the prediction of volume responsiveness in patients.", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 0, "Status": "Completed" },
+        { "Project Title": "Video-Assisted Self Review for Skill Learning", "Faculty Lead(s)": "Neal Fleming, M.D., Ph.D.; Brian Pitts, M.D., M.Ed.", "Participants": "Seeking participants", "Project Type": "Education / Research", "Brief Description": "Does Video-Assisted Self Review Help Students Learn a New Skill faster?", "Skills / Experience Needed": "Details TBD", "Time Commitment": "Details TBD", "Open Slots": 2, "Status": "Planned" }
+    ];
+
+    const tableBody = document.getElementById('project-table-body');
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const noResultsDiv = document.getElementById('no-results');
+
+    // --- Modal Handling ---
+    const modal = document.getElementById('signupModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const cancelButton = document.getElementById('cancelButton');
+    const signupForm = document.getElementById('signupForm');
+    const modalProjectTitle = document.getElementById('modalProjectTitle');
+    const projectTitleInput = document.getElementById('projectTitleInput');
+    const successMessage = document.getElementById('successMessage');
+
+    function openModal(projectTitle) {
+        modalProjectTitle.textContent = `Applying for: ${projectTitle}`;
+        projectTitleInput.value = projectTitle;
+        signupForm.reset();
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('.modal-content').classList.remove('-translate-y-10');
+        }, 10);
+    }
+
+    function closeModal() {
+        modal.classList.add('opacity-0');
+        modal.querySelector('.modal-content').classList.add('-translate-y-10');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 250);
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeModal(); });
+
+    signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(signupForm);
+        const applicationData = Object.fromEntries(formData.entries());
+        applicationData.topics = formData.getAll('topics');
+        applicationData.deliverables = formData.getAll('deliverables');
+        
+        console.log('--- New Application Submitted ---');
+        console.log(JSON.stringify(applicationData, null, 2));
+        
+        closeModal();
+        successMessage.classList.remove('hidden');
+        setTimeout(() => { successMessage.classList.add('hidden'); }, 5000);
+    });
+
+    // --- Table Rendering and Filtering ---
+    function renderTable(projects) {
+        tableBody.innerHTML = '';
+        if (projects.length === 0) {
+            noResultsDiv.classList.remove('hidden');
+            return;
+        }
+        
+        noResultsDiv.classList.add('hidden');
+
+        projects.forEach(project => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+            const isClosed = project['Open Slots'] === 0 || project.Status === 'Completed' || project.Status === 'Cancelled';
+            row.innerHTML = `
+                <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-gray-900">${project['Project Title']}</div>
+                    <div class="text-xs text-gray-500">${project['Time Commitment']}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900 font-medium">${project['Faculty Lead(s)']}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${project['Participants']}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getProjectTypeClass(project['Project Type'])}">
+                        ${project['Project Type']}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(project['Status'])}">
+                        ${project['Status']}
+                    </span>
+                </td>
+                <td class="px-6 py-4 min-w-[350px]">
+                    <div class="text-sm text-gray-800">${project['Brief Description']}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">${project['Open Slots']}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button class="signup-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition-colors shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed" 
+                            data-project-title="${project['Project Title']}" ${isClosed ? 'disabled' : ''}>
+                        ${isClosed ? 'Closed' : 'Apply Now'}
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        document.querySelectorAll('.signup-btn:not([disabled])').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const title = e.target.getAttribute('data-project-title');
+                openModal(title);
+            });
+        });
+    }
+    
+    function getStatusClass(status) {
+        switch(status) {
+            case 'Active': return 'bg-blue-100 text-blue-800';
+            case 'Planned': return 'bg-yellow-100 text-yellow-800';
+            case 'Completed': return 'bg-green-100 text-green-800';
+            case 'On Hold': return 'bg-purple-100 text-purple-800';
+            case 'Cancelled': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getProjectTypeClass(type) {
+        switch(type) {
+            case 'Research': return 'bg-green-100 text-green-800';
+            case 'QI': return 'bg-indigo-100 text-indigo-800';
+            case 'Education / Research': return 'bg-yellow-100 text-yellow-800';
+            case 'Clinical Trial': return 'bg-pink-100 text-pink-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function filterAndRender() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedType = typeFilter.value;
+        const selectedStatus = statusFilter.value;
+
+        const filteredProjects = projectData.filter(project => {
+            const matchesSearch = (
+                project['Project Title'].toLowerCase().includes(searchTerm) ||
+                project['Faculty Lead(s)'].toLowerCase().includes(searchTerm) ||
+                project['Brief Description'].toLowerCase().includes(searchTerm) ||
+                project['Participants'].toLowerCase().includes(searchTerm)
+            );
+            const matchesType = selectedType ? project['Project Type'] === selectedType : true;
+            const matchesStatus = selectedStatus ? project['Status'] === selectedStatus : true;
+
+            return matchesSearch && matchesType && matchesStatus;
+        });
+
+        renderTable(filteredProjects);
+    }
+
+    // Initial render
+    renderTable(projectData);
+
+    // Event listeners for filters
+    searchInput.addEventListener('input', filterAndRender);
+    typeFilter.addEventListener('change', filterAndRender);
+    statusFilter.addEventListener('change', filterAndRender);
+
+</script>
+
+</body>
+</html>
