@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QI Project - Improving Access to Anesthesiology Research</title>
+    <style>
+        /* --- Reset and Basic Setup --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0d6efd;
+            --text-color: #212529;
+            --light-text: #6c757d;
+            --background-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-light);
+        }
+
+        /* --- Main Layout & Container --- */
+        .container {
+            max-width: 960px;
+            margin: 2rem auto;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            padding: 2rem 3rem;
+        }
+
+        /* --- Navigation Header --- */
+        .page-header {
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header nav a {
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .page-header nav a:hover {
+            text-decoration: underline;
+        }
+        
+        /* --- Typography & Headings --- */
+        h1, h2, h3, h4, strong {
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* --- Reusable Components --- */
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background-color: var(--background-light);
+            color: var(--text-color);
+            padding: 0.35em 0.65em;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .content-box {
+            border: 1px solid var(--border-color);
+            background-color: var(--background-light);
+            padding: 1.5rem;
+            border-radius: 0.25rem;
+            margin: 1.5rem 0;
+        }
+
+        /* --- Specific Section Styling --- */
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .timeline-item, .measure-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 1.5rem;
+        }
+        
+        .timeline-item ul {
+            text-align: left;
+            padding-left: 18px;
+        }
+
+        .phase-time {
+            color: var(--light-text);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .measures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .measure-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Add emojis for clarity without heavy styling */
+        .measure-card.outcome h4::before { content: '📊'; }
+        .measure-card.process h4::before { content: '⚙️'; }
+        .measure-card.balancing h4::before { content: '⚖️'; }
+
+        .barrier-solution-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .barrier-solution-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: .25rem;
+            overflow: hidden;
+        }
+
+        .barrier, .solution {
+            padding: 1rem 1.5rem;
+        }
+
+        .barrier {
+            background-color: #fff6f6; /* Subtle red hint */
+        }
+        .solution {
+            background-color: #f6fff8; /* Subtle green hint */
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border: none;
+                padding: 1.5rem;
+                border-radius: 0;
+            }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .barrier-solution-pair { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="page-header">
+            <nav>
+                <a href="https://brianpx.github.io/research/">&larr; Back to Research Home</a>
+            </nav>
+        </header>
+
+        <main>
+            <span class="badge">QI PROJECT</span>
+            <h1>Improving Access to Anesthesiology Research Opportunities</h1>
+            <p class="subtitle">A Centralized, Role-Based Online Signup System for Learners</p>
+        
+            <section>
+                <h2>Background / Problem Statement</h2>
+                <div class="content-box">
+                    <p>Currently, residents and medical students in the Department of Anesthesiology and Pain Medicine rely on ad hoc networking or word-of-mouth to learn about available research and QI projects. This lack of centralized, up-to-date access creates inefficiencies, delays project recruitment, and may reduce learner engagement in scholarly activity.</p>
+                    <p>A centralized, easily accessible, and role-based signup system linked from the Department's Research Listing could improve visibility, streamline communication between PIs and potential learners, and increase participation in scholarly projects.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>QI Aim Statement</h2>
+                <div class="content-box">
+                    <p><strong>To increase the proportion of residents and medical students successfully matched to active anesthesiology research/QI projects by 50% within 6 months of implementing a centralized, role-based online signup system.</strong></p>
+                </div>
+            </section>
+
+            <section>
+                <h2>SMART Objectives</h2>
+                <ol>
+                    <li><strong>Specific:</strong> Develop and deploy an online signup platform linked to the Department's Research Listing with defined access roles (e.g., public view vs. UC Davis–restricted).</li>
+                    <li><strong>Measurable:</strong> Track number of project postings, student/resident signups, and PI-reported recruitment success rates before and after implementation.</li>
+                    <li><strong>Achievable:</strong> Use existing departmental IT infrastructure or approved platforms (C8 Health, Sona Systems, or equivalent).</li>
+                    <li><strong>Relevant:</strong> Addresses ACGME requirements for resident scholarly activity and supports departmental research culture.</li>
+                    <li><strong>Time-bound:</strong> Complete development, pilot testing, and first recruitment cycle within 6 months.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Intervention Plan</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Design Phase</h4>
+                        <div class="phase-time">Months 1–2</div>
+                        <ul>
+                            <li>Meet with stakeholders (residents, faculty, IT, research office)</li>
+                            <li>Draft requirements guide and platform specifications</li>
+                            <li>Select platform (C8 Health, Sona Systems, or custom build)</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Build Phase</h4>
+                        <div class="phase-time">Months 2–3</div>
+                        <ul>
+                            <li>Develop separate project listing page</li>
+                            <li>Configure access roles</li>
+                            <li>Set up PI self-service posting capability</li>
+                            <li>Implement automated email notifications</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Pilot Phase</h4>
+                        <div class="phase-time">Months 4–5</div>
+                        <ul>
+                            <li>Launch with selected PIs and 1–2 residency classes</li>
+                            <li>Collect feedback on usability and effectiveness</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Evaluation Phase</h4>
+                        <div class="phase-time">Month 6</div>
+                        <ul>
+                            <li>Compare pre- and post-intervention metrics</li>
+                            <li>Survey PIs and learners on ease of matching</li>
+                            <li>Refine system based on feedback</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Measures</h2>
+                <div class="measures-grid">
+                    <div class="measure-card outcome">
+                        <h4>Outcome Measures</h4>
+                        <ul>
+                            <li>Number of learners matched to projects per quarter</li>
+                            <li>PI satisfaction with recruitment (survey)</li>
+                        </ul>
+                    </div>
+                    <div class="measure-card process">
+                        <h4>Process Measures</h4>
+                        <ul>
+                            <li>Number of projects posted</li>
+                            <li>Number of signups per project</li>
+                            <li>Time from posting to first signup</li>
+                        </ul>
+                    </div>
+                    <div class="measure-card balancing">
+                        <h4>Balancing Measures</h4>
+                        <ul>
+                            <li>PI time spent managing postings</li>
+                            <li>IT support time required</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Potential Barriers & Solutions</h2>
+                 <div class="barrier-solution-grid">
+                    <div class="barrier-solution-pair">
+                        <div class="barrier">
+                            <h3>Barrier</h3>
+                            <p>PI hesitation to publicly list projects.</p>
+                        </div>
+                        <div class="solution">
+                            <h3>Solution</h3>
+                            <p>Use role-based access to allow UC Davis login–only visibility.</p>
+                        </div>
+                    </div>
+                    <div class="barrier-solution-pair">
+                        <div class="barrier">
+                            <h3>Barrier</h3>
+                            <p>Learner signup without follow-through.</p>
+                        </div>
+                        <div class="solution">
+                            <h3>Solution</h3>
+                            <p>Include PI review/approval step and a short application form.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Resident Role & Scholarly Output</h2>
+                <div class="content-box">
+                    <p><strong>The resident QI leader will:</strong></p>
+                    <ul>
+                        <li>Coordinate needs assessment and stakeholder meetings</li>
+                        <li>Lead platform configuration and pilot testing</li>
+                        <li>Collect and analyze pre/post metrics</li>
+                        <li>Present results at Departmental Research Day, a regional meeting, or in a peer-reviewed QI journal</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
