@@ -1,4 +1,13 @@
-<!-- /public/index.html -->
+<!--
+  Copyright (c) 2026 Brian Pitts, MD, MS, MEHP. All rights reserved.
+
+  This code may not be used, copied, modified, or reproduced in any form
+  without the express written permission of the author.
+
+  This project was developed independently and is not sponsored by,
+  affiliated with, or endorsed by the University of California,
+  Department of Anesthesiology and Pain Medicine.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,11 +70,17 @@
         .row-clickable {
             cursor: pointer;
             transition: background-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .row-clickable td:first-child {
             border-left: 3px solid transparent;
         }
-        .row-clickable:hover {
+        .row-clickable:hover td {
             background-color: #eff6ff;
+        }
+        .row-clickable:hover td:first-child {
             border-left-color: #3b82f6;
+        }
+        .row-clickable:hover {
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .row-clickable:active {
@@ -129,7 +144,7 @@
             <!-- Identity for "Applied" state -->
             <div class="sm:col-span-2">
                 <div class="flex items-baseline gap-1 mb-1">
-                    <label for="myEmail" class="text-xs font-medium text-gray-500">Your email</label>
+                    <label for="myEmail" class="text-xs font-medium text-gray-500" title="Stored locally to show Applied on this device">Your email</label>
                     <span id="emailError" class="hidden text-xs text-red-600">— Please enter a valid email address.</span>
                 </div>
                 <div class="relative">
@@ -188,7 +203,7 @@
                         <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="open" checked> Open
                     </label>
                     <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
-                        <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="closed"> Closed
+                        <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="closed"> Full (no slots)
                     </label>
                     <div class="border-t border-dashed border-gray-300 my-1"></div>
                     <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
@@ -276,7 +291,7 @@
 <!-- ════════════════════ MODAL ════════════════════ -->
 <div id="signupModal"
      class="modal fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 flex items-center justify-center p-4 z-50"
-     role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+     role="dialog" aria-modal="true" aria-labelledby="modalProjectTitle">
     <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-4xl transform -translate-y-10 flex flex-col"
          style="max-height:90vh">
 
@@ -608,8 +623,14 @@
     }));
 
     /* ─────────────────────────────────────────────────────────
-       localStorage helpers: overrides (admin edits)
+       localStorage helpers
     ───────────────────────────────────────────────────────── */
+    function safeSave(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); }
+        catch (e) { console.warn("localStorage save failed:", e.message); }
+    }
+
+    /* Overrides (admin edits) */
     function loadOverrides() {
         try {
             const raw = localStorage.getItem(OVERRIDES_KEY);
@@ -619,7 +640,7 @@
         }
     }
     function saveOverrides(overrides) {
-        localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
+        safeSave(OVERRIDES_KEY, overrides);
     }
     function applyOverrides(base, overrides) {
         return base.map(p => ({ ...p, ...(overrides[p.id] || {}) }));
@@ -646,14 +667,14 @@
         catch { return {}; }
     }
     function saveApplications(apps) {
-        localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps));
+        safeSave(APPLICATIONS_KEY, apps);
     }
     function loadProfile() {
         try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
         catch { return {}; }
     }
     function saveProfile(profile) {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        safeSave(PROFILE_KEY, profile);
     }
     function normalizeEmail(email) {
         return (email || "").trim().toLowerCase();
@@ -808,6 +829,10 @@
     /* ─────────────────────────────────────────────────────────
        Badges + utils
     ───────────────────────────────────────────────────────── */
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
     function statusBadge(s) {
         return ({ Active:"bg-blue-100 text-blue-800", Planning:"bg-amber-100 text-amber-800", Completed:"bg-green-100 text-green-800" })[s] || "bg-gray-100 text-gray-800";
     }
@@ -848,7 +873,7 @@
        Labels + sorting
     ───────────────────────────────────────────────────────── */
     function getChecked(cls) { return [...document.querySelectorAll(`.${cls}:checked`)].map(c => c.value); }
-    const FILTER_LABEL_MAP = { open: 'Open', closed: 'Closed', upcoming: 'Upcoming', completed: 'Completed', stale: 'Stale' };
+    const FILTER_LABEL_MAP = { open: 'Open', closed: 'Full', upcoming: 'Upcoming', completed: 'Completed', stale: 'Stale' };
     function updateLabels() {
         const types = getChecked('typeCheck'), statuses = getChecked('statusCheck');
         const at = document.querySelectorAll('.typeCheck').length;
@@ -1003,16 +1028,34 @@
     /* ─────────────────────────────────────────────────────────
        Open/close modal + scroll lock
     ───────────────────────────────────────────────────────── */
+    /* Focus trap: cycle Tab within the modal */
+    function trapFocus(e) {
+        if (e.key !== "Tab") return;
+        const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])');
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+    }
+
     function openModalWithProject(id) {
         showDetailsView(id);
         modal.classList.remove("hidden");
         lockBodyScroll();
+        document.addEventListener("keydown", trapFocus);
         requestAnimationFrame(() => {
             modal.classList.remove("opacity-0");
             modal.querySelector(".modal-content").classList.remove("-translate-y-10");
+            // Focus first interactive element
+            const first = modal.querySelector('button:not([disabled]), input:not([disabled]), a[href]');
+            if (first) first.focus();
         });
     }
     function closeModal() {
+        document.removeEventListener("keydown", trapFocus);
         // unlock immediately so background is usable as soon as it closes
         unlockBodyScroll();
         modal.classList.add("opacity-0");
@@ -1049,15 +1092,16 @@
             const matchesType = (!types.length || types.includes(p.type));
 
             const stale = isStale(p);
-            const isOpen   = p.status === "Active" && !stale;
-            const isClosed = !isOpen;
+            const openings = totalOpenings(p);
+            const isOpenSlots = p.status === "Active" && !stale && openings > 0;
+            const isClosedSlots = p.status === "Active" && !stale && openings === 0;
 
             let matchesStatus = false;
             if (statuses.length === 0) {
                 matchesStatus = false;
             } else {
-                if (statuses.includes("open") && isOpen) matchesStatus = true;
-                if (statuses.includes("closed") && isClosed) matchesStatus = true;
+                if (statuses.includes("open") && isOpenSlots) matchesStatus = true;
+                if (statuses.includes("closed") && isClosedSlots) matchesStatus = true;
                 if (statuses.includes("upcoming") && p.status === "Planning" && !stale) matchesStatus = true;
                 if (statuses.includes("completed") && p.status === "Completed") matchesStatus = true;
                 if (statuses.includes("stale") && stale) matchesStatus = true;
@@ -1075,6 +1119,11 @@
         cardContainer.innerHTML = "";
 
         if (!data.length) {
+            const msg = emailFilterActive
+                ? "No applications found for this email."
+                : "Try adjusting your search or filter criteria.";
+            noDesktop.querySelector("p:last-child").textContent = msg;
+            noMobile.querySelector("p:last-child").textContent = msg;
             noDesktop.classList.remove("hidden");
             noMobile.classList.remove("hidden");
             return;
@@ -1114,25 +1163,25 @@
 
             row.innerHTML = `
       <td class="px-4 py-3 align-top overflow-hidden">
-        <div class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} clamp-2 break-words">${p.title}</div>
-        <div class="text-xs text-gray-500 mt-0.5">${p.time || 'Time: TBD'}</div>
+        <div class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} clamp-2 break-words">${escapeHtml(p.title)}</div>
+        <div class="text-xs text-gray-500 mt-0.5">${escapeHtml(p.time) || 'Time: TBD'}</div>
         <div class="text-xs text-blue-600 mt-1">View details</div>
       </td>
-      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm font-medium clamp-2 break-words">${p.faculty || '—'}</div></td>
-      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm clamp-2 break-words">${p.trainees || '—'}</div></td>
+      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm font-medium clamp-2 break-words">${escapeHtml(p.faculty) || '—'}</div></td>
+      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm clamp-2 break-words">${escapeHtml(p.trainees) || '—'}</div></td>
       <td class="px-4 py-3 align-top overflow-hidden">
-        ${notAvailable ? `` : `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${p.type}</span>`}
+        ${notAvailable ? `` : `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${escapeHtml(p.type)}</span>`}
       </td>
       <td class="px-4 py-3 align-top overflow-hidden">
         <div class="flex flex-col gap-1">
           ${notAvailable ? `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Reviewing</span>` : `
           ${applied ? `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Applied</span>` : ``}
-          <span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${p.status}</span>`}
+          <span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${escapeHtml(p.status)}</span>`}
         </div>
       </td>
       <td class="px-4 py-3 align-top overflow-hidden">
-        <div class="text-sm text-gray-700 clamp-2 break-words">${p.description}</div>
-        <div class="text-xs text-gray-500 mt-1 clamp-1">Skills: ${p.skills}</div>
+        <div class="text-sm text-gray-700 clamp-2 break-words">${escapeHtml(p.description)}</div>
+        <div class="text-xs text-gray-500 mt-1 clamp-1">Skills: ${escapeHtml(p.skills)}</div>
       </td>
       <td class="px-4 py-3 text-center align-top overflow-hidden">
         <div class="text-xs font-semibold ${isOpen ? 'text-gray-900' : 'text-gray-500'}">MS: ${Number(p.studentSlots)||0} • R: ${Number(p.residentSlots)||0}</div>
@@ -1153,7 +1202,7 @@
             card.innerHTML = `
       <div class="flex items-start justify-between gap-3 mb-2">
         <button class="text-left flex-1" type="button" data-id="${p.id}">
-          <h3 class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} leading-snug">${p.title}</h3>
+          <h3 class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} leading-snug">${escapeHtml(p.title)}</h3>
           <div class="text-xs text-blue-600 mt-1">View details</div>
         </button>
       </div>
@@ -1161,19 +1210,19 @@
       <div class="flex flex-wrap gap-1.5 mb-3">
         ${notAvailable ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Reviewing</span>` : `
         ${applied ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Applied</span>` : ``}
-        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${p.type}</span>
-        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${p.status}</span>`}
-        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">${p.time || 'Time: TBD'}</span>
+        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${escapeHtml(p.type)}</span>
+        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${escapeHtml(p.status)}</span>`}
+        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">${escapeHtml(p.time) || 'Time: TBD'}</span>
         <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">MS: ${Number(p.studentSlots)||0} • R: ${Number(p.residentSlots)||0}</span>
       </div>
 
-      <p class="text-sm text-gray-700 mb-3 clamp-3">${p.description}</p>
+      <p class="text-sm text-gray-700 mb-3 clamp-3">${escapeHtml(p.description)}</p>
 
       <div class="text-xs text-gray-500 space-y-1 mb-4">
-        <p><span class="font-medium text-gray-600">Faculty:</span> ${p.faculty}</p>
-        ${p.trainees !== '—' ? `<p><span class="font-medium text-gray-600">Trainees:</span> ${p.trainees}</p>` : ''}
-        <p><span class="font-medium text-gray-600">Skills:</span> ${p.skills}</p>
-        <p><span class="font-medium text-gray-600">Timeline:</span> ${p.durationRange || 'TBD'}${(p.targetDate && p.targetDate !== 'TBD') ? ' • ' + p.targetDate : ''}</p>
+        <p><span class="font-medium text-gray-600">Faculty:</span> ${escapeHtml(p.faculty)}</p>
+        ${p.trainees !== '—' ? `<p><span class="font-medium text-gray-600">Trainees:</span> ${escapeHtml(p.trainees)}</p>` : ''}
+        <p><span class="font-medium text-gray-600">Skills:</span> ${escapeHtml(p.skills)}</p>
+        <p><span class="font-medium text-gray-600">Timeline:</span> ${escapeHtml(p.durationRange) || 'TBD'}${(p.targetDate && p.targetDate !== 'TBD') ? ' • ' + escapeHtml(p.targetDate) : ''}</p>
         <p><span class="font-medium text-gray-600">Last updated:</span> ${p.lastUpdated ? formatDate(p.lastUpdated) : 'TBD'}</p>
       </div>
 
@@ -1192,6 +1241,11 @@
                 openModalWithProject(Number(btn.dataset.id));
                 showFormView();
             });
+        });
+
+        // Prevent disabled buttons from bubbling click to row
+        document.querySelectorAll(".interest-btn[disabled]").forEach(btn => {
+            btn.addEventListener("click", (e) => e.stopPropagation());
         });
 
         // Mobile "View details" title button
@@ -1249,8 +1303,8 @@
         const fd = new FormData(signupForm);
         const applicantEmail = normalizeEmail(fd.get("email"));
 
-        if (!applicantEmail) {
-            alert("Please enter an email address.");
+        if (!applicantEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicantEmail)) {
+            alert("Please enter a valid email address.");
             return;
         }
         if (hasApplied(applicantEmail, currentProjectId)) {
@@ -1315,6 +1369,9 @@
             }
         }
 
+        const emailError = document.getElementById("emailError");
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         myEmailInput.addEventListener("input", () => {
             setCurrentApplicantEmail(myEmailInput.value);
             emailError.classList.add("hidden");
@@ -1329,9 +1386,6 @@
         myEmailInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") { e.preventDefault(); emailSearchBtn.click(); }
         });
-
-        const emailError = document.getElementById("emailError");
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         emailSearchBtn.addEventListener("click", () => {
             if (emailFilterActive) {
@@ -1374,7 +1428,11 @@
                 thead.style.top = filters.offsetHeight + "px";
             }
             sync();
-            window.addEventListener("resize", sync);
+            if (typeof ResizeObserver !== "undefined") {
+                new ResizeObserver(sync).observe(filters);
+            } else {
+                window.addEventListener("resize", sync);
+            }
         })();
 
         searchInput.addEventListener("input", filterAndRender);
