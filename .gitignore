@@ -1,0 +1,11 @@
+node_modules/
+.idea/
+xls/
+*.xlsx
+*.xls
+*.csv
+.env
+.DS_Store
+index-advanced.html
+js/csv-import-advanced.js
+js/init-advanced.js

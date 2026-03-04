@@ -13,130 +13,39 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; form-action 'self'; base-uri 'self'; frame-ancestors 'none';">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
     <title>Resident and Medical Student Research Opportunities</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        html { scrollbar-gutter: stable; }
-        body { font-family: 'Inter', sans-serif; }
-        .modal         { transition: opacity 0.25s ease; }
-        .modal-content { transition: transform 0.25s ease; }
-
-        .sticky-filters {
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            background: rgba(243,244,246,0.92);
-        }
-
-        .dropdown-panel {
-            display: none;
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            min-width: 100%;
-            z-index: 50;
-        }
-        .dropdown-panel.open { display: block; }
-
-        .modal-body::-webkit-scrollbar { width: 8px; }
-        .modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
-        .modal-body::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        .modal-body::-webkit-scrollbar-thumb:hover { background: #555; }
-
-        @keyframes checkDraw { 0% { stroke-dashoffset: 48; } 100% { stroke-dashoffset: 0; } }
-        .check-animated path {
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            animation: checkDraw 0.5s ease-out 0.2s forwards;
-        }
-        @keyframes scaleIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .confirm-icon { animation: scaleIn 0.3s ease-out forwards; }
-
-        /* Tailwind CDN doesn't include line-clamp plugin by default */
-        .clamp-1, .clamp-2, .clamp-3 {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .clamp-1 { -webkit-line-clamp: 1; }
-        .clamp-2 { -webkit-line-clamp: 2; }
-        .clamp-3 { -webkit-line-clamp: 3; }
-
-        .row-clickable {
-            cursor: pointer;
-            transition: background-color 0.15s ease, box-shadow 0.15s ease;
-        }
-        .row-clickable td:first-child {
-            border-left: 3px solid transparent;
-        }
-        .row-clickable:hover td {
-            background-color: #eff6ff;
-        }
-        .row-clickable:hover td:first-child {
-            border-left-color: #3b82f6;
-        }
-        .row-clickable:hover {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-        .row-clickable:active {
-            background-color: #dbeafe;
-        }
-
-        .select-cell { cursor: default; }
-
-        .export-bar {
-            max-height: 80px;
-            opacity: 1;
-            transition: max-height 0.3s ease, opacity 0.2s ease;
-        }
-        .export-bar.collapsed {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-
-        /* Table card wrapper — draws a single rounded border + shadow over the table */
-        .table-card-wrap {
-            position: relative;
-        }
-        .table-card-wrap::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05), inset 0 0 0 1px rgba(0,0,0,0.06);
-            pointer-events: none;
-            z-index: 31;
-        }
-
-        #stickyThead th {
-            background: #f9fafb;
-            /* Mask scrolling content in the gap above the thead */
-            box-shadow: 0 -2rem 0 0 rgb(243 244 246);
-        }
-        #table-body-desktop td { background: white; }
-
-        /* Clip corners to the card radius */
-        #stickyThead tr th:first-child { border-top-left-radius: 0.5rem; }
-        #stickyThead tr th:last-child  { border-top-right-radius: 0.5rem; }
-        #table-body-desktop tr:last-child td:first-child { border-bottom-left-radius: 0.5rem; }
-        #table-body-desktop tr:last-child td:last-child  { border-bottom-right-radius: 0.5rem; }
-    </style>
+    <script src="js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/output.css" integrity="sha384-8ujhqRuHTDd/8Vcbp/tLhrj50paLDguXsHRKUNzmL2gIjJ3bjipLF+7w5lytrHMk" crossorigin="anonymous">
 </head>
 
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
 
 <!-- ════════════════════ HEADER ════════════════════ -->
 <div class="container mx-auto px-4 sm:px-6 pt-6 pb-2">
-    <header class="text-center mb-4">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Resident and Medical Student Research Opportunities</h1>
-        <p class="text-gray-600 mt-1 text-sm sm:text-base">
-            Browse available projects and express interest – <span class="text-amber-600 font-medium">Demo Purposes Only</span>
+    <header class="text-center mb-4 relative">
+        <button id="darkModeToggle" type="button"
+                class="absolute right-0 top-0 p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle dark mode">
+            <!-- Sun icon (shown in dark mode) -->
+            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 7.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <!-- Moon icon (shown in light mode) -->
+            <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+            </svg>
+        </button>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Resident and Medical Student Research Opportunities</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
+            Browse available projects and express interest – <span class="text-amber-600 dark:text-amber-400 font-medium">Demo Purposes Only</span>
         </p>
     </header>
 </div>
@@ -144,26 +53,26 @@
 <!-- ════════════════════ STICKY FILTERS ════════════════════ -->
 <div id="stickyFilters" class="sticky-filters">
     <div class="container mx-auto px-4 sm:px-6 py-3">
-        <div class="bg-white rounded-lg shadow-sm p-3 grid grid-cols-1 sm:grid-cols-8 gap-3 items-end">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 grid grid-cols-1 sm:grid-cols-8 gap-3 items-end">
 
             <!-- Search -->
             <div class="sm:col-span-3">
-                <label for="searchInput" class="block text-xs font-medium text-gray-500 mb-1">Search by projects, faculty, keywords</label>
-                <input id="searchInput" type="text"
+                <label for="searchInput" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Search by projects, faculty, keywords</label>
+                <input id="searchInput" type="text" maxlength="200"
                        placeholder="Enter search term"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
             </div>
 
             <!-- Identity for "Applied" state -->
             <div class="sm:col-span-2">
                 <div class="flex items-baseline gap-1 mb-1">
-                    <label for="myEmail" class="text-xs font-medium text-gray-500" title="Stored locally to show Applied on this device">Your email</label>
+                    <label for="myEmail" class="text-xs font-medium text-gray-500 dark:text-gray-400" title="Stored locally to show Applied on this device">Your email</label>
                     <span id="emailError" class="hidden text-xs text-red-600">— Please enter a valid email address.</span>
                 </div>
                 <div class="relative">
-                    <input id="myEmail" type="email"
+                    <input id="myEmail" type="email" maxlength="254"
                            placeholder="Enter your email..."
-                           class="w-full border border-gray-300 rounded-lg pl-3 pr-20 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg pl-3 pr-20 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                     <button id="emailSearchBtn" type="button"
                             class="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium rounded-md bg-gray-200 text-gray-400 cursor-not-allowed"
                             disabled>Search</button>
@@ -172,15 +81,15 @@
 
             <!-- Project-type dropdown -->
             <div class="relative sm:col-span-1" id="typeDropdownWrap">
-                <span class="block text-xs font-medium text-gray-500 mb-1">Filter by type</span>
+                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Filter by type</span>
                 <button type="button" id="typeTrigger"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-left bg-white hover:bg-gray-50 flex justify-between items-center">
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-left bg-white dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex justify-between items-center">
                     <span id="typeLabel" class="truncate">All Project Types</span>
                     <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div id="typeDropdown" class="dropdown-panel bg-white border border-gray-200 rounded-lg shadow-lg p-3 space-y-2">
+                <div id="typeDropdown" class="dropdown-panel bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3 space-y-2">
                     <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
                         <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="Research" checked> Research
                     </label>
@@ -194,24 +103,24 @@
                         <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="Clin Trial" checked> Clin Trial
                     </label>
                     <div class="border-t pt-2 mt-1 flex gap-2 text-xs">
-                        <button type="button" onclick="setAll('typeCheck',true)"  class="text-blue-600 hover:underline">Select all</button>
+                        <button type="button" id="typeSelectAll" class="text-blue-600 hover:underline">Select all</button>
                         <span class="text-gray-300">|</span>
-                        <button type="button" onclick="setAll('typeCheck',false)" class="text-blue-600 hover:underline">Clear</button>
+                        <button type="button" id="typeClearAll" class="text-blue-600 hover:underline">Clear</button>
                     </div>
                 </div>
             </div>
 
             <!-- Filter dropdown -->
             <div class="relative sm:col-span-1" id="statusDropdownWrap">
-                <span class="block text-xs font-medium text-gray-500 mb-1">Filter by status</span>
+                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Filter by status</span>
                 <button type="button" id="statusTrigger"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-left bg-white hover:bg-gray-50 flex justify-between items-center">
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-left bg-white dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex justify-between items-center">
                     <span id="statusLabel" class="truncate">Filter</span>
                     <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div id="statusDropdown" class="dropdown-panel bg-white border border-gray-200 rounded-lg shadow-lg p-3 space-y-2">
+                <div id="statusDropdown" class="dropdown-panel bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3 space-y-2">
                     <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
                         <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="open" checked> Open
                     </label>
@@ -229,18 +138,18 @@
                         <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="stale"> Stale
                     </label>
                     <div class="border-t pt-2 mt-1 flex gap-2 text-xs">
-                        <button type="button" onclick="setAll('statusCheck',true)"  class="text-blue-600 hover:underline">Select all</button>
+                        <button type="button" id="statusSelectAll" class="text-blue-600 hover:underline">Select all</button>
                         <span class="text-gray-300">|</span>
-                        <button type="button" onclick="setAll('statusCheck',false)" class="text-blue-600 hover:underline">Clear</button>
+                        <button type="button" id="statusClearAll" class="text-blue-600 hover:underline">Clear</button>
                     </div>
                 </div>
             </div>
 
             <!-- Sort by -->
             <div class="sm:col-span-1">
-                <label for="sortSelect" class="block text-xs font-medium text-gray-500 mb-1">Sort by...</label>
+                <label for="sortSelect" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sort by...</label>
                 <select id="sortSelect"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                     <option value="updated_desc">Most recent</option>
                     <option value="slots_desc">Most slots</option>
                     <option value="hours_asc">Fewest hours</option>
@@ -254,23 +163,11 @@
 <!-- ════════════════════ MAIN CONTENT ════════════════════ -->
 <div class="container mx-auto px-4 sm:px-6 py-4 flex-1">
 
-    <!-- Export action bar -->
-    <div id="exportBar" class="export-bar collapsed bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 mb-3 flex items-center gap-3 flex-wrap">
-        <span id="selectedCount" class="text-sm font-medium text-blue-800">0 projects selected</span>
-        <button id="selectAllBtn" type="button" class="text-xs font-medium text-blue-700 hover:text-blue-900 underline">Select all visible</button>
-        <button id="clearSelectionBtn" type="button" class="text-xs font-medium text-gray-600 hover:text-gray-800 underline">Clear</button>
-        <button id="downloadCsvBtn" type="button" class="ml-auto px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">Download CSV</button>
-    </div>
-    <div class="flex justify-end mb-2">
-        <button id="downloadAllCsvBtn" type="button" class="text-xs text-gray-500 hover:text-blue-600 underline">Download all projects (CSV)</button>
-    </div>
-
     <!-- Desktop table -->
     <div class="hidden md:block table-card-wrap">
         <table class="w-full table-fixed">
             <colgroup>
-                <col style="width:3%">
-                <col style="width:19%">
+                <col style="width:22%">
                 <col style="width:14%">
                 <col style="width:12%">
                 <col style="width:7%">
@@ -281,7 +178,6 @@
             </colgroup>
             <thead id="stickyThead" style="position:sticky;z-index:30;">
             <tr>
-                <th class="px-2 py-3 text-center"><input type="checkbox" id="selectAllDesktop" class="h-4 w-4 text-blue-600 rounded border-gray-300" aria-label="Select all projects"></th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faculty</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trainees</th>
@@ -292,9 +188,9 @@
                 <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
             </tr>
             </thead>
-            <tbody id="table-body-desktop" class="divide-y divide-gray-200"></tbody>
+            <tbody id="table-body-desktop" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
         </table>
-        <div id="no-results-desktop" class="hidden text-center p-8 text-gray-500 bg-white border border-gray-200 rounded-b-lg">
+        <div id="no-results-desktop" class="hidden text-center p-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-lg">
             <p class="text-lg font-semibold">No projects found</p>
             <p class="text-sm">Try adjusting your search or filter criteria.</p>
         </div>
@@ -302,15 +198,17 @@
 
     <!-- Mobile cards -->
     <div id="card-container" class="md:hidden space-y-3"></div>
-    <div id="no-results-mobile" class="hidden md:hidden text-center p-8 text-gray-500">
+    <div id="no-results-mobile" class="hidden md:hidden text-center p-8 text-gray-500 dark:text-gray-400">
         <p class="text-lg font-semibold">No projects found</p>
         <p class="text-sm">Try adjusting your search or filter criteria.</p>
     </div>
 </div>
 
-<footer class="mt-auto border-t border-gray-200">
-    <div class="container mx-auto px-4 sm:px-6 py-4 text-center text-sm text-gray-500">
-        Created by Brian Pitts, MD, MS, MEHP &middot; &copy; 2026 Brian Pitts. All rights reserved.
+<footer class="mt-auto border-t border-gray-200 dark:border-gray-700">
+    <div class="container mx-auto px-4 sm:px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        Created by Brian Pitts, MD, MS, MEHP &middot; &copy; 2026 Brian Pitts. All rights reserved. &middot;
+        <button id="openDisclaimer" type="button"
+                class="underline hover:text-gray-700 transition-colors">Disclaimer</button>
     </div>
 </footer>
 
@@ -318,16 +216,16 @@
 <div id="signupModal"
      class="modal fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 flex items-center justify-center p-4 z-50"
      role="dialog" aria-modal="true" aria-labelledby="modalProjectTitle">
-    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-4xl transform -translate-y-10 flex flex-col"
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl transform -translate-y-10 flex flex-col"
          style="max-height:90vh">
 
         <!-- Header -->
-        <div id="modalHeader" class="flex justify-between items-start p-4 sm:p-6 border-b gap-3">
+        <div id="modalHeader" class="flex justify-between items-start p-4 sm:p-6 border-b dark:border-gray-700 gap-3">
             <div class="min-w-0 flex-1">
-                <h2 id="modalTitle" class="text-xl sm:text-2xl font-bold text-gray-900">Project Details</h2>
+                <h2 id="modalTitle" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Project Details</h2>
                 <p id="modalProjectTitle" class="text-sm text-blue-700 font-semibold mt-1 break-words"></p>
 
-                <div class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+                <div class="mt-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 text-sm text-gray-700 dark:text-gray-300">
                     <div class="flex flex-wrap gap-x-6 gap-y-1 items-center">
                         <div>
                             <span class="font-semibold">Sent to:</span>
@@ -347,7 +245,7 @@
                     </div>
 
                     <div id="appliedInfoDetail" class="hidden text-xs text-gray-600 mt-1"></div>
-                    <div class="text-xs text-gray-500 mt-1">Demo: submissions + admin edits persist to localStorage.</div>
+                    <div class="text-xs text-gray-500 mt-1">Demo: admin edits persist to localStorage; submissions last for this browser session only.</div>
                 </div>
             </div>
 
@@ -389,7 +287,7 @@
                             </div>
                         </div>
                         <p id="detailsStaleNote" class="hidden text-xs text-amber-700 mt-2">
-                            This listing hasn’t been updated in over 120 days. Please confirm availability and scope before committing.
+                            This listing hasn't been updated in over 120 days. Please confirm availability and scope before committing.
                         </p>
                     </div>
                 </div>
@@ -420,8 +318,8 @@
                 </div>
             </div>
 
-            <!-- Admin panel -->
-            <details id="adminPanel" class="border-t pt-4">
+            <!-- Admin panel (hidden unless ?admin=true) -->
+            <details id="adminPanel" class="border-t pt-4 hidden">
                 <summary class="cursor-pointer select-none text-sm font-semibold text-gray-800">
                     Admin (demo): edit contact, timeline, slots
                     <span class="text-gray-500 font-normal">— saved to localStorage</span>
@@ -431,25 +329,25 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contact name</label>
-                            <input id="adminContactName" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminContactName" maxlength="200" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contact email</label>
-                            <input id="adminContactEmail" type="email" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminContactEmail" type="email" maxlength="254" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Duration range</label>
-                            <input id="adminDurationRange" placeholder="e.g., 8–12 weeks" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminDurationRange" maxlength="200" autocomplete="off" placeholder="e.g., 8–12 weeks" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Target date</label>
-                            <input id="adminTargetDate" placeholder="e.g., ASA Oct 2026 / 2026-09-01" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminTargetDate" maxlength="200" autocomplete="off" placeholder="e.g., ASA Oct 2026 / 2026-09-01" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Last updated</label>
-                            <input id="adminLastUpdated" type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminLastUpdated" type="date" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:ring-blue-500 focus:border-blue-500" />
                             <button type="button" id="adminSetToday" class="mt-2 text-xs text-blue-700 hover:underline">Set to today</button>
                         </div>
                         <div>
@@ -463,17 +361,17 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Hours/week label</label>
-                            <input id="adminTime" placeholder="e.g., 2–4 hrs/week / Flexible" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input id="adminTime" maxlength="200" autocomplete="off" placeholder="e.g., 2–4 hrs/week / Flexible" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">MS slots</label>
-                                <input id="adminStudentSlots" type="number" min="0" step="1" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                                <input id="adminStudentSlots" type="number" min="0" max="99" step="1" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Resident slots</label>
-                                <input id="adminResidentSlots" type="number" min="0" step="1" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
+                                <input id="adminResidentSlots" type="number" min="0" max="99" step="1" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
                         </div>
                     </div>
@@ -509,7 +407,6 @@
 
         <!-- FORM VIEW -->
         <form id="signupForm" class="modal-body overflow-y-auto p-4 sm:p-6 space-y-6 hidden">
-            <!-- Mobile/All: ensure details are accessible -->
             <div class="flex items-center justify-between border-b pb-3">
                 <button id="backToDetails" type="button" class="text-sm font-semibold text-blue-700 hover:underline">
                     ← Back to details
@@ -524,20 +421,20 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full name <span class="text-red-600">*</span></label>
-                        <input id="fullName" name="fullName" required
+                        <input id="fullName" name="fullName" required maxlength="200"
                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                     </div>
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-600">*</span></label>
-                        <input id="email" type="email" name="email" required
+                        <input id="email" type="email" name="email" required maxlength="254"
                                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" />
                         <p class="text-xs text-gray-500 mt-1">After submit, this project will show as <span class="font-semibold">Applied</span> for this email on this device.</p>
                     </div>
 
                     <div class="sm:col-span-2">
                         <label for="interestNote" class="block text-sm font-medium text-gray-700 mb-1">Short interest note <span class="text-red-600">*</span></label>
-                        <textarea id="interestNote" name="interestNote" required rows="4"
+                        <textarea id="interestNote" name="interestNote" required rows="4" maxlength="2000"
                                   placeholder="In 3–5 sentences: why this project, relevant experience, and what you hope to learn or produce."
                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                     </div>
@@ -585,1019 +482,36 @@
     </div>
 </div>
 
-<script>
-    /* ─────────────────────────────────────────────────────────
-       Keys + constants
-    ───────────────────────────────────────────────────────── */
-    const OVERRIDES_KEY    = "research_projects_overrides_v1";
-    const APPLICATIONS_KEY = "research_projects_applications_v1";
-    const PROFILE_KEY      = "research_projects_profile_v1";
-
-    /* ─────────────────────────────────────────────────────────
-       Base project data
-    ───────────────────────────────────────────────────────── */
-    const baseProjectData = [
-        {id:1,title:"AI-PACU Study: Clinical Decision Support for Discharge & Escalation",faculty:"Brian Pitts, MD, MS",trainees:"Josephine Du",type:"Research",description:"Development and evaluation of an AI-based decision support tool to aid PACU nurses with escalation and discharge decisions using EHR-derived data.",skills:"Interest in perioperative medicine; basic data literacy; optional Python/R",time:"2–4 hrs/week",residentSlots:0,studentSlots:2,status:"Active",durationRange:"3–6 months (estimated)",targetDate:"TBD",lastUpdated:"2026-02-20",contactName:"Josephine Du (Project Lead)",contactEmail:""},
-        {id:2,title:"Stroke Thrombectomy Anesthesia Protocol",faculty:"Brian Pitts, MD, MS; Christian Bohringer, MD",trainees:"Michael Agarado",type:"QI",description:"Quality improvement project to streamline anesthesia workflows for mechanical thrombectomy to reduce treatment delays.",skills:"Interest in neuroanesthesia and systems improvement",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Active",durationRange:"8–12 weeks (estimated)",targetDate:"TBD",lastUpdated:"2026-02-10",contactName:"Michael Agarado (Trainee Lead)",contactEmail:""},
-        {id:3,title:"BranchLab: Physiologic Airway Simulation",faculty:"Brian Pitts, MD, MS; Hannah Bechtold, MD",trainees:"Callum Rowe, MD; Derron Yu, MD; Ravina Brring, MD; Ellie Tsang",type:"Edu/Res",description:"Development of interactive, case-based simulations to teach physiologic airway management to anesthesia trainees.",skills:"Interest in education; optional UI/UX or web development",time:"Flexible",residentSlots:1,studentSlots:1,status:"Active",durationRange:"Flexible",targetDate:"TBD",lastUpdated:"2025-09-01",contactName:"Callum Rowe (Resident Lead)",contactEmail:""},
-        {id:4,title:"Pediatric Anesthesia Safety Dashboard",faculty:"Faculty Lead TBD",trainees:"—",type:"QI",description:"Creation of a dashboard tracking perioperative safety metrics in pediatric anesthesia to support quality monitoring.",skills:"Basic data interpretation; interest in patient safety",time:"2–4 hrs/week",residentSlots:0,studentSlots:2,status:"Planning",durationRange:"TBD",targetDate:"TBD",lastUpdated:"2025-10-15",contactName:"Faculty Lead TBD",contactEmail:""},
-        {id:5,title:"EVD Safety Campaign",faculty:"Faculty Lead TBD",trainees:"—",type:"QI",description:"Quality improvement initiative focused on improving safety practices surrounding external ventricular drain management.",skills:"Interest in neurosurgical or neurocritical care safety",time:"1–2 hrs/week",residentSlots:0,studentSlots:0,status:"Planning",durationRange:"TBD",targetDate:"TBD",lastUpdated:"2025-07-01",contactName:"Faculty Lead TBD",contactEmail:""},
-        {id:6,title:"Patient self-reported duration of analgesia after shoulder surgery and interscalene block with and without perineural adjuncts",faculty:"Robin Aldwinckle, B.M.B.S., F.R.C.A.",trainees:"—",type:"Research",description:"Observational study assessing patient-reported analgesia duration following interscalene blocks with adjunct medications.",skills:"Interest in regional anesthesia; chart review skills",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active",durationRange:"TBD",targetDate:"TBD",lastUpdated:"2025-12-01",contactName:"Robin Aldwinckle",contactEmail:""},
-        {id:7,title:"A comparison of 0.25% bupivacaine vs bupivacaine + clonidine/dexamethasone vs buprenorphine vs liposomal bupivacaine for outpatient arthroscopic shoulder surgery",faculty:"Robin Aldwinckle, B.M.B.S., F.R.C.A.",trainees:"—",type:"Research",description:"Comparative effectiveness study of local anesthetic strategies for postoperative pain control in shoulder surgery.",skills:"Interest in regional anesthesia; data abstraction",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active",durationRange:"TBD",targetDate:"TBD",lastUpdated:"2025-12-01",contactName:"Robin Aldwinckle",contactEmail:""},
-        {id:8,title:"Evaluation of dynamic monitors for the prediction of volume responsiveness in patients with and without diastolic dysfunction",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Physiologic study evaluating the accuracy of dynamic hemodynamic monitors in predicting fluid responsiveness.",skills:"Interest in cardiac physiology; basic statistics",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed",durationRange:"Completed",targetDate:"Completed",lastUpdated:"2024-06-01",contactName:"Neal Fleming",contactEmail:""},
-        {id:9,title:"Do preoperative PECS I and II nerve blocks reduce post-mastectomy opioid consumption, LOS, and improve comfort?",faculty:"Jon Zhou, MD",trainees:"—",type:"Research",description:"Retrospective cohort study evaluating the impact of PECS blocks on postoperative outcomes after mastectomy.",skills:"Interest in regional anesthesia; chart review",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Completed",durationRange:"Completed",targetDate:"Completed",lastUpdated:"2024-06-01",contactName:"Jon Zhou",contactEmail:""},
-        {id:10,title:"Transversus abdominus plane (TAP) blocks with ropivacaine continuous infusion catheters vs liposomal bupivacaine after renal transplant",faculty:"Dr. Furukawa",trainees:"—",type:"Clin Trial",description:"Prospective randomized control trial comparing two different TAP block methods (ropivacaine continuous infusion catheters vs single-dose liposomal bupivacaine) for controlling pain after kidney transplant surgery, evaluating effectiveness and costs.",skills:"Evaluate and analyze clinical data",time:"2–3 hrs/week",residentSlots:1,studentSlots:1,status:"Active",durationRange:"TBD",targetDate:"TBD",lastUpdated:"2026-03-01",contactName:"Dr. Furukawa",contactEmail:""}
-    ];
-
-    const tailRows = [
-        {id:11,title:"Concurrent use of ultrasound-tagged near-infrared spectroscopy and near-infrared spectroscopy",faculty:"Bradlee Bachar",trainees:"—",type:"Research",description:"Feasibility and validation study combining ultrasound-tagged NIRS with standard NIRS monitoring.",skills:"Interest in monitoring technology",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:12,title:"Post-operative opioid usage, adverse events, and LOS after TAP blocks in renal transplant patients",faculty:"Kristin Bennett, D.O.",trainees:"—",type:"Research",description:"Retrospective outcomes study examining opioid use and complications after TAP block utilization.",skills:"Chart review skills; interest in pain outcomes",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Completed"},
-        {id:13,title:"Effect of dexmedetomidine on postoperative recovery during low-income country cleft surgery missions",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Observational study evaluating perioperative dexmedetomidine use during international surgical missions.",skills:"Interest in global health anesthesia",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:14,title:"Sugammadex: Impact on Practice and Outcomes",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Assessment of clinical practice changes and outcomes following the introduction of sugammadex.",skills:"Interest in outcomes research",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:15,title:"Effects of IV fluid bolus on assessment of left ventricular diastolic function",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Physiologic echocardiography-based study examining how fluid boluses alter diastolic measurements.",skills:"Interest in cardiac ultrasound",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:16,title:"Comparing Continuous Cardiac Output Monitors in Cardiothoracic Surgery",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Comparative evaluation of continuous cardiac output monitoring devices during cardiac surgery.",skills:"Interest in cardiothoracic anesthesia",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:17,title:"Comparing Dynamic Parameters of Continuous Cardiac Function Monitors in Cardiothoracic Surgery",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Study comparing dynamic cardiac performance parameters across monitoring platforms.",skills:"Interest in hemodynamics",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:18,title:"Impact of the introduction of Sugammadex on 30-day postoperative readmission rates",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Retrospective outcomes study examining readmission rates after sugammadex adoption.",skills:"Basic statistics; chart review",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:19,title:"Impact of the introduction of Sugammadex on provider practice and PACU ventilation",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Practice-pattern analysis of neuromuscular reversal strategies and PACU ventilation.",skills:"Interest in perioperative workflow",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:20,title:"Infant memory, visual attention, and cognitive testing pre- and post-anesthesia",faculty:"Cathy Lammers, MD",trainees:"—",type:"Research",description:"Prospective neurodevelopmental assessment study in infants undergoing anesthesia.",skills:"Interest in pediatric anesthesia research",time:"2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:21,title:"The perioperative use of hemodynamic monitor devices and surgical outcomes",faculty:"Hong Liu, MD",trainees:"—",type:"Research",description:"Large-scale observational study linking hemodynamic monitoring strategies to surgical outcomes.",skills:"Data analysis interest",time:"2–3 hrs/week",residentSlots:1,studentSlots:0,status:"Active"},
-        {id:22,title:"Dexmedetomidine and renal transplants",faculty:"Hong Liu, MD",trainees:"—",type:"Research",description:"Evaluation of dexmedetomidine use and outcomes in renal transplant recipients.",skills:"Interest in transplant anesthesia",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Active"},
-        {id:23,title:"Impact of race in perioperative pain management in pediatric tonsillectomy and adenoidectomy",faculty:"Niroop Ravula, M.B.B.S., F.R.C.A.",trainees:"—",type:"Research",description:"Health equity study examining racial disparities in perioperative pain management.",skills:"Interest in disparities research",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:24,title:"Minimally invasive hemodynamic monitors during acute normovolemic hemodilution",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Physiologic study of minimally invasive monitors during controlled hemodilution.",skills:"Interest in hemodynamic physiology",time:"2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:25,title:"Does Video-Assisted Self Review Help Students Learn a New Skill Faster?",faculty:"Neal Fleming, MD, PhD; Brian Pitts, MD, MEd",trainees:"—",type:"Edu/Res",description:"Educational research study evaluating video-assisted self-review for procedural skill acquisition.",skills:"Interest in medical education",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Completed"},
-        {id:26,title:"Non-diagnostic serum troponin as a marker for perioperative risk",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Outcomes study assessing prognostic value of low-level perioperative troponin elevations.",skills:"Basic statistics",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:27,title:"Modified pre-operative oral acetaminophen vs intravenous acetaminophen",faculty:"Cathy Lammers, MD",trainees:"—",type:"Research",description:"Comparative study of oral versus IV acetaminophen for perioperative analgesia.",skills:"Interest in pain management",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:28,title:"Etomidate + propofol vs etomidate vs propofol for induction: pilot observational study",faculty:"Hong Liu, MD",trainees:"—",type:"Research",description:"Pilot observational study comparing induction agent strategies.",skills:"Interest in anesthetic pharmacology",time:"1–2 hrs/week",residentSlots:1,studentSlots:0,status:"Active"},
-        {id:29,title:"TAP block catheters vs liposomal bupivacaine after colorectal surgery",faculty:"Jon Zhou, MD",trainees:"—",type:"Clin Trial",description:"Prospective randomized trial evaluating analgesic strategies after colorectal surgery.",skills:"Interest in clinical trials",time:"2–3 hrs/week",residentSlots:1,studentSlots:0,status:"Completed"},
-        {id:30,title:"Merck: Impact of Quantitative Neuromuscular Monitoring and Sugammadex Reversal Following Abdominal Surgery",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Clin Trial",description:"Before/after study evaluating the impact of monitoring and reversal guidelines for neuromuscular blocking drugs on post-operative outcomes for patients undergoing abdominal surgeries, including continuous blood oxygen saturation monitoring via wearable device for 24 hours post-operatively.",skills:"Assist with device placement and retrieval; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:2,status:"Active"},
-        {id:31,title:"Edwards Autoregulation: Observational Data Collection for Autoregulation Algorithm Development",faculty:"Hong Liu, MD",trainees:"—",type:"Research",description:"Observational study using non-invasive sensors and an arterial catheter to compare the accuracy of non-invasive sensors to measure blood pressure throughout surgical procedures vs standard of care monitors.",skills:"Evaluate and analyze clinical data",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:32,title:"Edwards ClearSight: ClearSight NextGen System Clinical Development Study",faculty:"Hong Liu, MD",trainees:"—",type:"Clin Trial",description:"Study involving blood pressure devices placed on patient fingers and arterial catheter, collecting heart function and blood pressure data via HemoSphere Monitor for approximately 4 hours to develop a new non-invasive finger-cuff blood pressure device.",skills:"Assist with device placement and retrieval; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:33,title:"Edwards Smart Trends: Acumen HPI Smart Alerts and Smart Trends for Intra-operative Hemodynamic Management",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Clin Trial",description:"Study evaluating whether automated prompts from Acumen HPI Smart Alerts and Smart Trends improve compliance with a pre-defined hemodynamic management plan to reduce low blood pressure and kidney injury during major elective non-cardiac surgery.",skills:"Assist with device placement and retrieval; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:34,title:"Racial Bias: Prospective Racial Bias Data Collection Study",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Study evaluating potential hemoglobin saturation (SpO2) measurement bias in finger pulse oximetry devices across different skin tones, using arterial blood gas data and the Massey Martin Skin Tone scale to assess measurement discrepancies.",skills:"Assist in data collection; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:2,status:"Active"},
-        {id:35,title:"Rostrum OR: Evaluation of Non-Invasive Pulmonary Health Parameters for Acute Care Medicine",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Study of the VQm Pulmonary Health Monitor (PHM) measuring lung air volume distribution, functional residual capacity, dead space, pulmonary blood flow, and shunt fraction during surgical procedures, compared against GE Carescape ventilator measurements.",skills:"Assist in data collection; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:36,title:"Rostrum ICU: Evaluation of VQm Pulmonary Health Monitor for Intensive Care Medicine",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Evaluation of the VQm Pulmonary Health Monitor in an ICU setting to ensure comparable measurements to current monitors for assessing the impact of mechanical ventilation on lung and heart function, with monitoring up to 72 hours.",skills:"Assist in data collection; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:37,title:"Vertex Study: VX24-548-108 Phase 3b Non-Opioid Pain Management",faculty:"Dr. Copenhaver",trainees:"—",type:"Clin Trial",description:"Phase 3b study investigating use of an unapproved non-opioid highly selective voltage-gated sodium channel inhibitor as part of multimodal postoperative pain management.",skills:"Assist in data collection; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:38,title:"APPL0010: Feasibility of Wireless ECG and Vital Signs Monitor",faculty:"Neal Fleming, MD, PhD",trainees:"—",type:"Research",description:"Feasibility study evaluating experimental wireless vital signs monitoring systems (INVSENSOR0057 and Radius VSM ECG) in the Electrophysiology Lab and ICU, comparing accuracy and reliability against standard wired monitoring systems.",skills:"Assist in data collection; evaluate and analyze clinical data",time:"2–4 hrs/week",residentSlots:0,studentSlots:1,status:"Active"},
-        {id:39,title:"VR Study: Audiovisual Distraction with Virtual Reality in Prone Interventional Pain Procedures",faculty:"Dr. Jung",trainees:"—",type:"Research",description:"Study investigating whether Virtual Reality (VR) audiovisual distraction can reduce anxiety, decrease pain levels, and improve patient satisfaction during prone interventional pain procedures, with pre-, intra-, and post-procedure surveys.",skills:"Evaluate and analyze clinical data",time:"1–2 hrs/week",residentSlots:0,studentSlots:1,status:"Active"}
-    ].map(p => ({
-        ...p,
-        durationRange: p.status === "Completed" ? "Completed" : "TBD",
-        targetDate: p.status === "Completed" ? "Completed" : "TBD",
-        lastUpdated: p.status === "Completed" ? "2024-06-01" : "2025-12-01",
-        contactName: (p.faculty || "Not listed").split(";")[0].trim() || "Not listed",
-        contactEmail: ""
-    }));
-
-    /* ─────────────────────────────────────────────────────────
-       localStorage helpers
-    ───────────────────────────────────────────────────────── */
-    function safeSave(key, value) {
-        try { localStorage.setItem(key, JSON.stringify(value)); }
-        catch (e) { console.warn("localStorage save failed:", e.message); }
-    }
-
-    /* Overrides (admin edits) */
-    function loadOverrides() {
-        try {
-            const raw = localStorage.getItem(OVERRIDES_KEY);
-            return raw ? JSON.parse(raw) : {};
-        } catch {
-            return {};
-        }
-    }
-    function saveOverrides(overrides) {
-        safeSave(OVERRIDES_KEY, overrides);
-    }
-    function applyOverrides(base, overrides) {
-        return base.map(p => ({ ...p, ...(overrides[p.id] || {}) }));
-    }
-    function updateProject(id, patch, projectDataRef) {
-        const overrides = loadOverrides();
-        overrides[id] = { ...(overrides[id] || {}), ...patch };
-        saveOverrides(overrides);
-
-        // mutate in-memory
-        for (let i = 0; i < projectDataRef.length; i++) {
-            if (projectDataRef[i].id === id) {
-                projectDataRef[i] = { ...projectDataRef[i], ...patch };
-                break;
-            }
-        }
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       localStorage helpers: applications + profile ("Applied")
-    ───────────────────────────────────────────────────────── */
-    function loadApplications() {
-        try { return JSON.parse(localStorage.getItem(APPLICATIONS_KEY)) || {}; }
-        catch { return {}; }
-    }
-    function saveApplications(apps) {
-        safeSave(APPLICATIONS_KEY, apps);
-    }
-    function loadProfile() {
-        try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
-        catch { return {}; }
-    }
-    function saveProfile(profile) {
-        safeSave(PROFILE_KEY, profile);
-    }
-    function normalizeEmail(email) {
-        return (email || "").trim().toLowerCase();
-    }
-    function getCurrentApplicantEmail() {
-        const profile = loadProfile();
-        return normalizeEmail(profile.email || "");
-    }
-    function setCurrentApplicantEmail(email) {
-        const profile = loadProfile();
-        profile.email = normalizeEmail(email);
-        saveProfile(profile);
-    }
-    function hasApplied(email, projectId) {
-        const e = normalizeEmail(email);
-        if (!e) return false;
-        const apps = loadApplications();
-        return Boolean(apps[e]?.[String(projectId)]);
-    }
-    function getApplicationMeta(email, projectId) {
-        const e = normalizeEmail(email);
-        if (!e) return null;
-        const apps = loadApplications();
-        return apps[e]?.[String(projectId)] || null;
-    }
-    function recordApplication(email, projectId, payload) {
-        const e = normalizeEmail(email);
-        if (!e) return;
-        const apps = loadApplications();
-        apps[e] = apps[e] || {};
-        apps[e][String(projectId)] = {
-            submittedAt: new Date().toISOString(),
-            ...payload
-        };
-        saveApplications(apps);
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Scroll lock (prevents background page scroll when modal open)
-    ───────────────────────────────────────────────────────── */
-    let __scrollLockY = 0;
-    function lockBodyScroll() {
-        // preserve scroll position and prevent background scroll (works on iOS Safari)
-        __scrollLockY = window.scrollY || 0;
-        document.body.style.position = "fixed";
-        document.body.style.top = `-${__scrollLockY}px`;
-        document.body.style.left = "0";
-        document.body.style.right = "0";
-        document.body.style.width = "100%";
-        document.body.style.overflowY = "scroll";
-    }
-    function unlockBodyScroll() {
-        const top = document.body.style.top;
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.style.width = "";
-        document.body.style.overflowY = "";
-        const y = top ? Math.abs(parseInt(top, 10)) : __scrollLockY;
-        window.scrollTo(0, y || 0);
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       State + DOM refs
-    ───────────────────────────────────────────────────────── */
-    let projectData = [];
-    let currentProjectId = null;
-
-    const selectedIds = new Set();
-    let lastRenderedIds = [];
-
-    function toggleSelection(id) {
-        if (selectedIds.has(id)) { selectedIds.delete(id); }
-        else { selectedIds.add(id); }
-        syncExportBar();
-        syncCheckboxes();
-    }
-    function selectAllVisible() {
-        lastRenderedIds.forEach(id => selectedIds.add(id));
-        syncExportBar();
-        syncCheckboxes();
-    }
-    function clearSelection() {
-        selectedIds.clear();
-        syncExportBar();
-        syncCheckboxes();
-    }
-    function syncExportBar() {
-        const bar = document.getElementById('exportBar');
-        const count = document.getElementById('selectedCount');
-        if (selectedIds.size > 0) {
-            bar.classList.remove('collapsed');
-            count.textContent = selectedIds.size + ' project' + (selectedIds.size === 1 ? '' : 's') + ' selected';
-        } else {
-            bar.classList.add('collapsed');
-        }
-    }
-    function syncCheckboxes() {
-        document.querySelectorAll('.select-checkbox').forEach(cb => {
-            cb.checked = selectedIds.has(Number(cb.dataset.id));
-        });
-        const headerCb = document.getElementById('selectAllDesktop');
-        if (lastRenderedIds.length === 0) {
-            headerCb.checked = false;
-            headerCb.indeterminate = false;
-        } else {
-            const visibleSelected = lastRenderedIds.filter(id => selectedIds.has(id)).length;
-            headerCb.checked = visibleSelected === lastRenderedIds.length;
-            headerCb.indeterminate = visibleSelected > 0 && visibleSelected < lastRenderedIds.length;
-        }
-    }
-
-    const tableBodyDesktop   = document.getElementById("table-body-desktop");
-    const cardContainer      = document.getElementById("card-container");
-    const noDesktop          = document.getElementById("no-results-desktop");
-    const noMobile           = document.getElementById("no-results-mobile");
-    const searchInput        = document.getElementById("searchInput");
-    const myEmailInput       = document.getElementById("myEmail");
-    const emailSearchBtn     = document.getElementById("emailSearchBtn");
-    let emailFilterActive    = false;
-
-    const modal              = document.getElementById("signupModal");
-    const modalTitle         = document.getElementById("modalProjectTitle");
-    const hiddenTitle        = document.getElementById("projectTitleInput");
-
-    const signupForm         = document.getElementById("signupForm");
-    const confirmationView   = document.getElementById("confirmationView");
-    const confirmProjectName = document.getElementById("confirmProjectName");
-    const detailsView        = document.getElementById("projectDetailsView");
-
-    const sortSelect         = document.getElementById("sortSelect");
-
-    const routeToName        = document.getElementById("routeToName");
-    const routeToEmailWrap   = document.getElementById("routeToEmailWrap");
-    const routeToEmail       = document.getElementById("routeToEmail");
-    const staleBadgeDetail   = document.getElementById("staleBadgeDetail");
-    const appliedBadgeDetail = document.getElementById("appliedBadgeDetail");
-    const appliedInfoDetail  = document.getElementById("appliedInfoDetail");
-
-    const badgeType          = document.getElementById("badgeType");
-    const badgeStatus        = document.getElementById("badgeStatus");
-    const badgeTime          = document.getElementById("badgeTime");
-    const badgeSlots         = document.getElementById("badgeSlots");
-
-    const detailsDescription = document.getElementById("detailsDescription");
-    const detailsFaculty     = document.getElementById("detailsFaculty");
-    const detailsTrainees    = document.getElementById("detailsTrainees");
-    const detailsSkills      = document.getElementById("detailsSkills");
-
-    const detailsDuration    = document.getElementById("detailsDuration");
-    const detailsTargetDate  = document.getElementById("detailsTargetDate");
-    const detailsLastUpdated = document.getElementById("detailsLastUpdated");
-    const detailsStaleNote   = document.getElementById("detailsStaleNote");
-
-    const detailsContactName = document.getElementById("detailsContactName");
-    const detailsContactEmailWrap = document.getElementById("detailsContactEmailWrap");
-    const detailsContactEmail = document.getElementById("detailsContactEmail");
-
-    const backToDetailsBtn   = document.getElementById("backToDetails");
-    const formProjectId      = document.getElementById("formProjectId");
-
-    /* Admin inputs */
-    const adminContactName   = document.getElementById("adminContactName");
-    const adminContactEmail  = document.getElementById("adminContactEmail");
-    const adminDurationRange = document.getElementById("adminDurationRange");
-    const adminTargetDate    = document.getElementById("adminTargetDate");
-    const adminLastUpdated   = document.getElementById("adminLastUpdated");
-    const adminStatus        = document.getElementById("adminStatus");
-    const adminTime          = document.getElementById("adminTime");
-    const adminStudentSlots  = document.getElementById("adminStudentSlots");
-    const adminResidentSlots = document.getElementById("adminResidentSlots");
-
-    /* ─────────────────────────────────────────────────────────
-       Dropdown wiring
-    ───────────────────────────────────────────────────────── */
-    function toggleDropdown(id) {
-        const panel = document.getElementById(id);
-        document.querySelectorAll('.dropdown-panel').forEach(p => {
-            if (p.id !== id) p.classList.remove('open');
-        });
-        panel.classList.toggle('open');
-    }
-    document.addEventListener('click', e => {
-        if (!e.target.closest('#typeDropdownWrap'))   document.getElementById('typeDropdown').classList.remove('open');
-        if (!e.target.closest('#statusDropdownWrap')) document.getElementById('statusDropdown').classList.remove('open');
-    });
-    document.getElementById('typeTrigger').addEventListener('click',   () => toggleDropdown('typeDropdown'));
-    document.getElementById('statusTrigger').addEventListener('click', () => toggleDropdown('statusDropdown'));
-
-    function setAll(cls, val) {
-        document.querySelectorAll(`.${cls}`).forEach(cb => cb.checked = val);
-        filterAndRender();
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Badges + utils
-    ───────────────────────────────────────────────────────── */
-    function escapeHtml(str) {
-        if (!str) return "";
-        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-    }
-    function statusBadge(s) {
-        return ({ Active:"bg-blue-100 text-blue-800", Planning:"bg-amber-100 text-amber-800", Completed:"bg-green-100 text-green-800" })[s] || "bg-gray-100 text-gray-800";
-    }
-    function typeBadge(t) {
-        return ({ Research:"bg-emerald-100 text-emerald-800", QI:"bg-indigo-100 text-indigo-800", "Edu/Res":"bg-yellow-100 text-yellow-800", "Clin Trial":"bg-pink-100 text-pink-800" })[t] || "bg-gray-100 text-gray-800";
-    }
-    function totalOpenings(p) { return (Number(p.residentSlots) || 0) + (Number(p.studentSlots) || 0); }
-    function parseHoursMin(timeStr) {
-        if (!timeStr) return 999;
-        const s = timeStr.toLowerCase();
-        if (s.includes('flex')) return 999;
-        const match = s.match(/(\d+(\.\d+)?)/);
-        return match ? Number(match[1]) : 999;
-    }
-    function toDateOrNull(iso) {
-        if (!iso || typeof iso !== "string") return null;
-        const d = new Date(`${iso}T00:00:00`);
-        return Number.isNaN(d.getTime()) ? null : d;
-    }
-    function formatDate(iso) {
-        const d = toDateOrNull(iso);
-        if (!d) return "TBD";
-        return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-    }
-    function daysSince(iso) {
-        const d = toDateOrNull(iso);
-        if (!d) return null;
-        const now = new Date();
-        return Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-    }
-    function isStale(p) {
-        if (p.status === "Completed") return false;
-        const ds = daysSince(p.lastUpdated);
-        return ds !== null && ds > 120;
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       CSV export
-    ───────────────────────────────────────────────────────── */
-    function csvEscape(value) {
-        if (value == null) return '';
-        const str = String(value);
-        if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
-            return '"' + str.replace(/"/g, '""') + '"';
-        }
-        return str;
-    }
-
-    function generateCsv(projects) {
-        const headers = [
-            'id','title','faculty','trainees','type','description','skills','time',
-            'status','durationRange','targetDate','lastUpdated','staleOver120Days',
-            'studentSlots','residentSlots','totalOpenings','contactName','contactEmail'
-        ];
-        const rows = projects.map(p => [
-            p.id, p.title, p.faculty, p.trainees, p.type, p.description, p.skills, p.time,
-            p.status, p.durationRange, p.targetDate, p.lastUpdated, isStale(p) ? 'Yes' : 'No',
-            Number(p.studentSlots) || 0, Number(p.residentSlots) || 0, totalOpenings(p),
-            p.contactName || '', p.contactEmail || ''
-        ]);
-        return headers.join(',') + '\n' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
-    }
-
-    function downloadCsv(content, filename) {
-        const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    function csvFilename() {
-        const d = new Date();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        return `anes-research-opportunities_${yyyy}-${mm}-${dd}.csv`;
-    }
-
-    function downloadSelectedCsv() {
-        const selected = projectData.filter(p => selectedIds.has(p.id));
-        if (!selected.length) return;
-        downloadCsv(generateCsv(selected), csvFilename());
-    }
-
-    function downloadAllCsv() {
-        if (!projectData.length) return;
-        downloadCsv(generateCsv(projectData), csvFilename());
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Labels + sorting
-    ───────────────────────────────────────────────────────── */
-    function getChecked(cls) { return [...document.querySelectorAll(`.${cls}:checked`)].map(c => c.value); }
-    const FILTER_LABEL_MAP = { open: 'Open', closed: 'Full', upcoming: 'Upcoming', completed: 'Completed', stale: 'Stale' };
-    function updateLabels() {
-        const types = getChecked('typeCheck'), statuses = getChecked('statusCheck');
-        const at = document.querySelectorAll('.typeCheck').length;
-        const as = document.querySelectorAll('.statusCheck').length;
-        document.getElementById('typeLabel').textContent   = types.length === 0 ? 'No Types' : types.length === at ? 'All Project Types' : types.join(', ');
-        const filterLabels = statuses.map(s => FILTER_LABEL_MAP[s] || s);
-        document.getElementById('statusLabel').textContent = statuses.length === 0 ? 'No Filters' : statuses.length === as ? 'Filter' : filterLabels.join(', ');
-    }
-    function applySort(data) {
-        const mode = sortSelect.value;
-        const arr = [...data];
-        if (mode === "slots_desc") arr.sort((a,b) => totalOpenings(b) - totalOpenings(a));
-        else if (mode === "hours_asc") arr.sort((a,b) => parseHoursMin(a.time) - parseHoursMin(b.time));
-        else arr.sort((a,b) => (toDateOrNull(b.lastUpdated)?.getTime() ?? 0) - (toDateOrNull(a.lastUpdated)?.getTime() ?? 0));
-        return arr;
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Views
-    ───────────────────────────────────────────────────────── */
-    function showDetailsView(id) {
-        const p = projectData.find(x => x.id === id);
-        if (!p) return;
-
-        currentProjectId = id;
-        modalTitle.textContent = p.title;
-        hiddenTitle.value = p.title;
-
-        // routing
-        routeToName.textContent = p.contactName?.trim() ? p.contactName : "Not listed";
-        if (p.contactEmail?.trim()) {
-            routeToEmailWrap.classList.remove("hidden");
-            routeToEmail.textContent = p.contactEmail;
-            routeToEmail.href = `mailto:${p.contactEmail}`;
-        } else {
-            routeToEmailWrap.classList.add("hidden");
-            routeToEmail.textContent = "";
-            routeToEmail.href = "#";
-        }
-
-        const stale = isStale(p);
-        staleBadgeDetail.classList.toggle("hidden", !stale);
-
-        const currentEmail = getCurrentApplicantEmail();
-        const applied = hasApplied(currentEmail, p.id);
-        appliedBadgeDetail.classList.toggle("hidden", !applied);
-
-        if (applied) {
-            const meta = getApplicationMeta(currentEmail, p.id);
-            const when = meta?.submittedAt ? new Date(meta.submittedAt).toLocaleString() : null;
-            appliedInfoDetail.textContent = when ? `Applied on ${when} (for ${currentEmail}).` : `Applied (for ${currentEmail}).`;
-            appliedInfoDetail.classList.remove("hidden");
-        } else {
-            appliedInfoDetail.textContent = "";
-            appliedInfoDetail.classList.add("hidden");
-        }
-
-        badgeType.textContent = p.type;
-        badgeType.className = `px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}`;
-
-        badgeStatus.textContent = p.status;
-        badgeStatus.className = `px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}`;
-
-        badgeTime.textContent = p.time || "Time: TBD";
-        badgeSlots.textContent = `MS: ${Number(p.studentSlots)||0} open • Resident: ${Number(p.residentSlots)||0} open`;
-
-        detailsDescription.textContent = p.description || "";
-        detailsFaculty.textContent = p.faculty || "—";
-        detailsTrainees.textContent = p.trainees || "—";
-        detailsSkills.textContent = p.skills || "—";
-
-        detailsDuration.textContent = p.durationRange || "TBD";
-        detailsTargetDate.textContent = p.targetDate || "TBD";
-        detailsLastUpdated.textContent = p.lastUpdated ? formatDate(p.lastUpdated) : "TBD";
-        detailsStaleNote.classList.toggle("hidden", !stale);
-
-        detailsContactName.textContent = p.contactName?.trim() ? p.contactName : "Not listed";
-        if (p.contactEmail?.trim()) {
-            detailsContactEmailWrap.classList.remove("hidden");
-            detailsContactEmail.textContent = p.contactEmail;
-            detailsContactEmail.href = `mailto:${p.contactEmail}`;
-        } else {
-            detailsContactEmailWrap.classList.add("hidden");
-            detailsContactEmail.textContent = "";
-            detailsContactEmail.href = "#";
-        }
-
-        // Admin prefill
-        adminContactName.value = p.contactName || "";
-        adminContactEmail.value = p.contactEmail || "";
-        adminDurationRange.value = p.durationRange || "";
-        adminTargetDate.value = p.targetDate || "";
-        adminLastUpdated.value = p.lastUpdated || "";
-        adminStatus.value = p.status || "Active";
-        adminTime.value = p.time || "";
-        adminStudentSlots.value = Number(p.studentSlots) || 0;
-        adminResidentSlots.value = Number(p.residentSlots) || 0;
-
-        // CTA state (Applied supersedes)
-        const openings = totalOpenings(p);
-        const isOpen = (p.status !== "Completed" && openings > 0);
-        const goBtn = document.getElementById("goToInterest");
-
-        if (p.status === "Completed") {
-            goBtn.disabled = true;
-            goBtn.textContent = "Completed";
-            goBtn.className = "px-6 py-2 bg-transparent text-gray-400 font-semibold rounded-lg cursor-default";
-        } else if (stale) {
-            goBtn.disabled = true;
-            goBtn.textContent = "Not Available";
-            goBtn.className = "px-6 py-2 bg-transparent text-gray-400 font-semibold rounded-lg cursor-default";
-        } else if (applied) {
-            goBtn.disabled = true;
-            goBtn.textContent = "Applied";
-            goBtn.className = "px-6 py-2 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed";
-        } else {
-            goBtn.textContent = isOpen ? "Apply" : "Full";
-            goBtn.disabled = !isOpen;
-            goBtn.className = isOpen
-                ? "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-center"
-                : "px-6 py-2 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-center";
-        }
-
-        detailsView.classList.remove("hidden");
-        signupForm.classList.add("hidden");
-        confirmationView.classList.add("hidden");
-    }
-
-    function showFormView() {
-        detailsView.classList.add("hidden");
-        signupForm.classList.remove("hidden");
-        confirmationView.classList.add("hidden");
-
-        formProjectId.textContent = String(currentProjectId ?? "");
-
-        const currentEmail = getCurrentApplicantEmail();
-        signupForm.reset();
-        if (currentEmail) {
-            const emailField = signupForm.querySelector('[name="email"]');
-            if (emailField) emailField.value = currentEmail;
-        }
-        setTimeout(() => signupForm.querySelector("#fullName")?.focus(), 50);
-    }
-
-    function showConfirmView(title) {
-        detailsView.classList.add("hidden");
-        signupForm.classList.add("hidden");
-        confirmationView.classList.remove("hidden");
-        confirmProjectName.textContent = title;
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Open/close modal + scroll lock
-    ───────────────────────────────────────────────────────── */
-    /* Focus trap: cycle Tab within the modal */
-    function trapFocus(e) {
-        if (e.key !== "Tab") return;
-        const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])');
-        if (!focusable.length) return;
-        const first = focusable[0], last = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-        } else {
-            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
-    }
-
-    function openModalWithProject(id) {
-        showDetailsView(id);
-        modal.classList.remove("hidden");
-        lockBodyScroll();
-        document.addEventListener("keydown", trapFocus);
-        requestAnimationFrame(() => {
-            modal.classList.remove("opacity-0");
-            modal.querySelector(".modal-content").classList.remove("-translate-y-10");
-            // Focus first interactive element
-            const first = modal.querySelector('button:not([disabled]), input:not([disabled]), a[href]');
-            if (first) first.focus();
-        });
-    }
-    function closeModal() {
-        document.removeEventListener("keydown", trapFocus);
-        // unlock immediately so background is usable as soon as it closes
-        unlockBodyScroll();
-        modal.classList.add("opacity-0");
-        modal.querySelector(".modal-content").classList.add("-translate-y-10");
-        setTimeout(() => {
-            modal.classList.add("hidden");
-            currentProjectId = null;
-        }, 250);
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Filter + render
-    ───────────────────────────────────────────────────────── */
-    function filterAndRender() {
-        const term = (searchInput.value || "").toLowerCase().trim();
-        const types = getChecked('typeCheck'), statuses = getChecked('statusCheck');
-
-        const filtered = projectData.filter(p => {
-            // Email filter: only active when user clicks Search
-            if (emailFilterActive) {
-                const email = getCurrentApplicantEmail();
-                if (email && !hasApplied(email, p.id)) return false;
-            }
-
-            const matchesTerm =
-                (!term ||
-                    p.title.toLowerCase().includes(term) ||
-                    (p.faculty || "").toLowerCase().includes(term) ||
-                    (p.description || "").toLowerCase().includes(term) ||
-                    (p.trainees || "").toLowerCase().includes(term) ||
-                    (p.skills || "").toLowerCase().includes(term)
-                );
-
-            const matchesType = (!types.length || types.includes(p.type));
-
-            const stale = isStale(p);
-            const openings = totalOpenings(p);
-            const isOpenSlots = p.status === "Active" && !stale && openings > 0;
-            const isClosedSlots = p.status === "Active" && !stale && openings === 0;
-
-            let matchesStatus = false;
-            if (statuses.length === 0) {
-                matchesStatus = false;
-            } else {
-                if (statuses.includes("open") && isOpenSlots) matchesStatus = true;
-                if (statuses.includes("closed") && isClosedSlots) matchesStatus = true;
-                if (statuses.includes("upcoming") && p.status === "Planning" && !stale) matchesStatus = true;
-                if (statuses.includes("completed") && p.status === "Completed") matchesStatus = true;
-                if (statuses.includes("stale") && stale) matchesStatus = true;
-            }
-
-            return matchesTerm && matchesType && matchesStatus;
-        });
-
-        updateLabels();
-        renderAll(applySort(filtered));
-    }
-
-    function renderAll(data) {
-        tableBodyDesktop.innerHTML = "";
-        cardContainer.innerHTML = "";
-
-        if (!data.length) {
-            lastRenderedIds = [];
-            const msg = emailFilterActive
-                ? "No applications found for this email."
-                : "Try adjusting your search or filter criteria.";
-            noDesktop.querySelector("p:last-child").textContent = msg;
-            noMobile.querySelector("p:last-child").textContent = msg;
-            noDesktop.classList.remove("hidden");
-            noMobile.classList.remove("hidden");
-            syncExportBar();
-            syncCheckboxes();
-            return;
-        }
-        noDesktop.classList.add("hidden");
-        noMobile.classList.add("hidden");
-
-        lastRenderedIds = data.map(p => p.id);
-
-        const currentEmail = getCurrentApplicantEmail();
-
-        data.forEach(p => {
-            const openings = totalOpenings(p);
-            const isOpen = (p.status !== "Completed" && openings > 0);
-            const muted = (p.status === "Completed");
-            const stale = isStale(p);
-            const applied = hasApplied(currentEmail, p.id);
-
-            const isCompleted = p.status === "Completed";
-            const notAvailable = stale;
-            const buttonDisabled = applied || !isOpen || isCompleted || notAvailable;
-            const buttonLabel = isCompleted ? "Completed" : notAvailable ? "Not Available" : (applied ? "Applied" : (isOpen ? "Apply" : "Full"));
-            const buttonClass = isCompleted
-                ? "bg-transparent text-gray-400 cursor-default shadow-none"
-                : notAvailable
-                    ? "bg-transparent text-gray-400 cursor-default shadow-none"
-                    : buttonDisabled
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 text-white";
-
-            // Desktop row
-            const row = document.createElement("tr");
-            row.className = `row-clickable ${(muted || notAvailable) ? "text-gray-400" : ""}`;
-            if (notAvailable) row.style.opacity = "0.7";
-            row.tabIndex = 0;
-            row.role = "button";
-            row.addEventListener("click", (e) => { if (e.target.closest('.select-cell')) return; openModalWithProject(p.id); });
-            row.addEventListener("keydown", (e) => { if (e.target.closest('.select-cell')) return; if (e.key === "Enter") openModalWithProject(p.id); });
-
-            row.innerHTML = `
-      <td class="px-2 py-3 text-center align-top select-cell">
-        <input type="checkbox" class="select-checkbox h-4 w-4 text-blue-600 rounded border-gray-300" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(p.title)}">
-      </td>
-      <td class="px-4 py-3 align-top overflow-hidden">
-        <div class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} clamp-2 break-words">${escapeHtml(p.title)}</div>
-        <div class="text-xs text-gray-500 mt-0.5">${escapeHtml(p.time) || 'Time: TBD'}</div>
-        <div class="text-xs text-blue-600 mt-1">View details</div>
-      </td>
-      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm font-medium clamp-2 break-words">${escapeHtml(p.faculty) || '—'}</div></td>
-      <td class="px-4 py-3 align-top overflow-hidden"><div class="text-sm clamp-2 break-words">${escapeHtml(p.trainees) || '—'}</div></td>
-      <td class="px-4 py-3 align-top overflow-hidden">
-        ${notAvailable ? `` : `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${escapeHtml(p.type)}</span>`}
-      </td>
-      <td class="px-4 py-3 align-top overflow-hidden">
-        <div class="flex flex-col gap-1">
-          ${notAvailable ? `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Reviewing</span>` : `
-          ${applied ? `<span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Applied</span>` : ``}
-          <span class="block w-full text-center whitespace-nowrap px-3 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${escapeHtml(p.status)}</span>`}
+<!-- ════════════════════ DISCLAIMER MODAL ════════════════════ -->
+<div id="disclaimerModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+        <button id="closeDisclaimerX" type="button"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
+                aria-label="Close disclaimer">&times;</button>
+        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Disclaimer</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            This website is for demonstration purposes only. It is an independent project
+            created and maintained by Brian Pitts and is not affiliated with, endorsed by,
+            or representative of UC Davis, UC Davis Health, or any other institution. All
+            information presented here is compiled from publicly available sources and may
+            not reflect current opportunities. While every effort is made to ensure accuracy,
+            no guarantee is provided. Users should verify details independently before making
+            decisions based on this content.
+        </p>
+        <div class="mt-5 text-right">
+            <button id="closeDisclaimerBtn" type="button"
+                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                Close
+            </button>
         </div>
-      </td>
-      <td class="px-4 py-3 align-top overflow-hidden">
-        <div class="text-sm text-gray-700 clamp-2 break-words">${escapeHtml(p.description)}</div>
-        <div class="text-xs text-gray-500 mt-1 clamp-1">Skills: ${escapeHtml(p.skills)}</div>
-      </td>
-      <td class="px-4 py-3 text-center align-top overflow-hidden">
-        <div class="text-xs font-semibold ${isOpen ? 'text-gray-900' : 'text-gray-500'}">MS: ${Number(p.studentSlots)||0} • R: ${Number(p.residentSlots)||0}</div>
-        <div class="text-xs text-gray-500 mt-0.5">Total: ${openings}</div>
-      </td>
-      <td class="px-4 py-3 text-right align-top overflow-hidden">
-        <button class="interest-btn w-full px-3 py-2 text-xs font-semibold rounded-lg transition-colors shadow-sm ${buttonClass}"
-                data-id="${p.id}" ${buttonDisabled ? "disabled" : ""}>
-          ${buttonLabel}
-        </button>
-      </td>
-    `;
-            tableBodyDesktop.appendChild(row);
+    </div>
+</div>
 
-            // Mobile card (details remain visible; title opens modal)
-            const card = document.createElement("div");
-            card.className = `bg-white rounded-lg shadow-sm border p-4 ${muted ? 'opacity-60' : ''} ${notAvailable ? 'opacity-70' : ''}`;
-            card.innerHTML = `
-      <div class="flex items-start justify-between gap-3 mb-2">
-        <input type="checkbox" class="select-checkbox h-4 w-4 mt-1 text-blue-600 rounded border-gray-300 shrink-0" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(p.title)}">
-        <button class="text-left flex-1" type="button" data-id="${p.id}">
-          <h3 class="text-sm font-semibold ${muted ? 'text-gray-400' : 'text-gray-900'} leading-snug">${escapeHtml(p.title)}</h3>
-          <div class="text-xs text-blue-600 mt-1">View details</div>
-        </button>
-      </div>
-
-      <div class="flex flex-wrap gap-1.5 mb-3">
-        ${notAvailable ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Reviewing</span>` : `
-        ${applied ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Applied</span>` : ``}
-        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadge(p.type)}">${escapeHtml(p.type)}</span>
-        <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${statusBadge(p.status)}">${escapeHtml(p.status)}</span>`}
-        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">${escapeHtml(p.time) || 'Time: TBD'}</span>
-        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">MS: ${Number(p.studentSlots)||0} • R: ${Number(p.residentSlots)||0}</span>
-      </div>
-
-      <p class="text-sm text-gray-700 mb-3 clamp-3">${escapeHtml(p.description)}</p>
-
-      <div class="text-xs text-gray-500 space-y-1 mb-4">
-        <p><span class="font-medium text-gray-600">Faculty:</span> ${escapeHtml(p.faculty)}</p>
-        ${p.trainees !== '—' ? `<p><span class="font-medium text-gray-600">Trainees:</span> ${escapeHtml(p.trainees)}</p>` : ''}
-        <p><span class="font-medium text-gray-600">Skills:</span> ${escapeHtml(p.skills)}</p>
-        <p><span class="font-medium text-gray-600">Timeline:</span> ${escapeHtml(p.durationRange) || 'TBD'}${(p.targetDate && p.targetDate !== 'TBD') ? ' • ' + escapeHtml(p.targetDate) : ''}</p>
-        <p><span class="font-medium text-gray-600">Last updated:</span> ${p.lastUpdated ? formatDate(p.lastUpdated) : 'TBD'}</p>
-      </div>
-
-      <button class="interest-btn w-full px-3 py-2 text-xs font-semibold rounded-lg transition-colors shadow-sm ${buttonClass}"
-              data-id="${p.id}" ${buttonDisabled ? "disabled" : ""}>
-        ${buttonLabel}
-      </button>
-    `;
-            cardContainer.appendChild(card);
-        });
-
-        // Clicking enabled interest button: open modal and jump to form
-        document.querySelectorAll(".interest-btn:not([disabled])").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openModalWithProject(Number(btn.dataset.id));
-                showFormView();
-            });
-        });
-
-        // Prevent disabled buttons from bubbling click to row
-        document.querySelectorAll(".interest-btn[disabled]").forEach(btn => {
-            btn.addEventListener("click", (e) => e.stopPropagation());
-        });
-
-        // Mobile "View details" title button
-        document.querySelectorAll("#card-container button[data-id]").forEach(btn => {
-            btn.addEventListener("click", () => openModalWithProject(Number(btn.dataset.id)));
-        });
-
-        // Checkbox selection listeners
-        document.querySelectorAll('.select-checkbox').forEach(cb => {
-            cb.addEventListener('click', (e) => e.stopPropagation());
-            cb.addEventListener('change', () => toggleSelection(Number(cb.dataset.id)));
-        });
-
-        syncExportBar();
-        syncCheckboxes();
-    }
-
-    /* ─────────────────────────────────────────────────────────
-       Admin actions
-    ───────────────────────────────────────────────────────── */
-    document.getElementById("adminSetToday").addEventListener("click", () => {
-        adminLastUpdated.value = new Date().toISOString().split("T")[0];
-    });
-    document.getElementById("adminSaveProject").addEventListener("click", () => {
-        if (!currentProjectId) return;
-
-        const patch = {
-            contactName: adminContactName.value.trim(),
-            contactEmail: adminContactEmail.value.trim(),
-            durationRange: adminDurationRange.value.trim() || "TBD",
-            targetDate: adminTargetDate.value.trim() || "TBD",
-            lastUpdated: adminLastUpdated.value || new Date().toISOString().split("T")[0],
-            status: adminStatus.value,
-            time: adminTime.value.trim() || "TBD",
-            studentSlots: Math.max(0, Number(adminStudentSlots.value || 0)),
-            residentSlots: Math.max(0, Number(adminResidentSlots.value || 0))
-        };
-
-        updateProject(currentProjectId, patch, projectData);
-        filterAndRender();
-        showDetailsView(currentProjectId);
-    });
-    document.getElementById("adminResetProject").addEventListener("click", () => {
-        if (!currentProjectId) return;
-        const overrides = loadOverrides();
-        delete overrides[currentProjectId];
-        saveOverrides(overrides);
-
-        const mergedBase = [...baseProjectData, ...tailRows];
-        projectData = applyOverrides(mergedBase, overrides);
-
-        filterAndRender();
-        showDetailsView(currentProjectId);
-    });
-
-    /* ─────────────────────────────────────────────────────────
-       Submission (blocks re-apply)
-    ───────────────────────────────────────────────────────── */
-    signupForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const p = projectData.find(x => x.id === currentProjectId);
-        if (!p) return;
-
-        const fd = new FormData(signupForm);
-        const applicantEmail = normalizeEmail(fd.get("email"));
-
-        if (!applicantEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicantEmail)) {
-            alert("Please enter a valid email address.");
-            return;
-        }
-        if (hasApplied(applicantEmail, currentProjectId)) {
-            alert("You’ve already applied to this project using this email on this device.");
-            return;
-        }
-
-        const payload = Object.fromEntries(fd.entries());
-        payload.projectId = String(currentProjectId);
-        payload.projectTitle = p.title;
-
-        recordApplication(applicantEmail, currentProjectId, payload);
-
-        setCurrentApplicantEmail(applicantEmail);
-        myEmailInput.value = applicantEmail;
-
-        console.log("--- Interest Submitted ---", JSON.stringify({ ...payload, submittedAt: new Date().toISOString() }, null, 2));
-
-        filterAndRender();
-        showConfirmView(p.title);
-    });
-
-    /* ─────────────────────────────────────────────────────────
-       Controls
-    ───────────────────────────────────────────────────────── */
-    document.getElementById("closeModal").addEventListener("click", closeModal);
-    document.getElementById("cancelButton").addEventListener("click", closeModal);
-    document.getElementById("confirmClose").addEventListener("click", closeModal);
-    document.getElementById("detailsClose").addEventListener("click", closeModal);
-
-    modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal(); });
-
-    document.getElementById("goToInterest").addEventListener("click", showFormView);
-
-    // NEW: Back to details from form (mobile + desktop)
-    backToDetailsBtn.addEventListener("click", () => {
-        if (currentProjectId) showDetailsView(currentProjectId);
-    });
-
-    /* ─────────────────────────────────────────────────────────
-       Init
-    ───────────────────────────────────────────────────────── */
-    (function init() {
-        myEmailInput.value = "";
-        emailFilterActive = false;
-
-        function updateEmailBtn() {
-            const hasValue = myEmailInput.value.trim().length > 0;
-            if (emailFilterActive) {
-                emailSearchBtn.textContent = "Clear";
-                emailSearchBtn.disabled = false;
-                emailSearchBtn.className = "absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors";
-            } else if (hasValue) {
-                emailSearchBtn.textContent = "Search";
-                emailSearchBtn.disabled = false;
-                emailSearchBtn.className = "absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors cursor-pointer";
-            } else {
-                emailSearchBtn.textContent = "Search";
-                emailSearchBtn.disabled = true;
-                emailSearchBtn.className = "absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium rounded-md bg-gray-200 text-gray-400 cursor-not-allowed";
-            }
-        }
-
-        const emailError = document.getElementById("emailError");
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        myEmailInput.addEventListener("input", () => {
-            setCurrentApplicantEmail(myEmailInput.value);
-            emailError.classList.add("hidden");
-            myEmailInput.classList.remove("border-red-500");
-            if (emailFilterActive) {
-                emailFilterActive = false;
-                filterAndRender();
-            }
-            updateEmailBtn();
-        });
-
-        myEmailInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); emailSearchBtn.click(); }
-        });
-
-        emailSearchBtn.addEventListener("click", () => {
-            if (emailFilterActive) {
-                // Clear
-                emailFilterActive = false;
-                myEmailInput.value = "";
-                setCurrentApplicantEmail("");
-                emailError.classList.add("hidden");
-                myEmailInput.classList.remove("border-red-500");
-            } else {
-                // Validate before searching
-                if (!emailPattern.test(myEmailInput.value.trim())) {
-                    emailError.classList.remove("hidden");
-                    myEmailInput.classList.add("border-red-500");
-                    return;
-                }
-                emailError.classList.add("hidden");
-                myEmailInput.classList.remove("border-red-500");
-                // Search
-                emailFilterActive = true;
-                setCurrentApplicantEmail(myEmailInput.value);
-            }
-            updateEmailBtn();
-            filterAndRender();
-        });
-
-        updateEmailBtn();
-
-        const overrides = loadOverrides();
-        const mergedBase = [...baseProjectData, ...tailRows];
-        projectData = applyOverrides(mergedBase, overrides);
-
-        filterAndRender();
-
-        /* Sticky thead: pin just below the sticky filter bar */
-        (function initStickyThead() {
-            const filters = document.getElementById("stickyFilters");
-            const thead   = document.getElementById("stickyThead");
-            function sync() {
-                thead.style.top = filters.offsetHeight + "px";
-            }
-            sync();
-            if (typeof ResizeObserver !== "undefined") {
-                new ResizeObserver(sync).observe(filters);
-            } else {
-                window.addEventListener("resize", sync);
-            }
-        })();
-
-        searchInput.addEventListener("input", filterAndRender);
-        sortSelect.addEventListener("change", filterAndRender);
-
-        document.querySelectorAll(".typeCheck, .statusCheck").forEach(cb =>
-            cb.addEventListener("change", filterAndRender)
-        );
-
-        // CSV export wiring
-        document.getElementById('selectAllBtn').addEventListener('click', selectAllVisible);
-        document.getElementById('clearSelectionBtn').addEventListener('click', clearSelection);
-        document.getElementById('downloadCsvBtn').addEventListener('click', downloadSelectedCsv);
-        document.getElementById('downloadAllCsvBtn').addEventListener('click', downloadAllCsv);
-        document.getElementById('selectAllDesktop').addEventListener('change', (e) => {
-            if (e.target.checked) { selectAllVisible(); }
-            else { lastRenderedIds.forEach(id => selectedIds.delete(id)); syncExportBar(); syncCheckboxes(); }
-        });
-    })();
-</script>
+<!-- ════════════════════ SCRIPTS ════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/init.js"></script>
 
 </body>
+</html>
