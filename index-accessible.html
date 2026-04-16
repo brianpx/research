@@ -1,0 +1,556 @@
+<!--
+  Copyright (c) 2026 Brian Pitts, MD, MS, MEHP. All rights reserved.
+
+  This code may not be used, copied, modified, or reproduced in any form
+  without the express written permission of the author.
+
+  This project was developed independently and is not sponsored by,
+  affiliated with, or endorsed by the University of California,
+  Department of Anesthesiology and Pain Medicine.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; form-action 'self'; base-uri 'self'; frame-ancestors 'none';">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+    <title>Resident and Medical Student Research Opportunities</title>
+
+    <script src="js/frame-guard.js"></script>
+    <script src="js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/output.css" crossorigin="anonymous">
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+
+<!-- Skip to main content link -->
+<a href="#main-content" class="sr-only">Skip to main content</a>
+
+<!-- ════════════════════ HEADER ════════════════════ -->
+<div class="container mx-auto px-4 sm:px-6 pt-6 pb-2">
+    <header class="text-center mb-4 relative">
+        <button id="darkModeToggle" type="button"
+                class="absolute right-0 top-0 p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle dark mode">
+            <!-- Sun icon (shown in dark mode) -->
+            <svg class="w-5 h-5 hidden dark:block" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 7.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <!-- Moon icon (shown in light mode) -->
+            <svg class="w-5 h-5 block dark:hidden" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+            </svg>
+        </button>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Resident and Medical Student Research Opportunities</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
+            Browse available projects and express interest – <span class="text-amber-600 dark:text-amber-400 font-medium">Demo Purposes Only</span>
+        </p>
+    </header>
+</div>
+
+<!-- ════════════════════ STICKY FILTERS ════════════════════ -->
+<div id="stickyFilters" class="sticky-filters">
+    <div class="container mx-auto px-4 sm:px-6 py-3">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 grid grid-cols-1 sm:grid-cols-8 gap-3 items-end">
+
+            <!-- Search -->
+            <div class="sm:col-span-3">
+                <label for="searchInput" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Search by projects, faculty, keywords</label>
+                <input id="searchInput" type="text" maxlength="200"
+                       placeholder="Enter search term"
+                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            </div>
+
+            <!-- Identity for "Applied" state -->
+            <div class="sm:col-span-2">
+                <div class="flex items-baseline gap-1 mb-1">
+                    <label for="myEmail" class="text-xs font-medium text-gray-500 dark:text-gray-400" title="Stored locally to show Applied on this device">Your email</label>
+                    <span id="emailError" class="hidden text-xs text-red-600" role="alert">— Please enter a valid email address.</span>
+                </div>
+                <div class="relative">
+                    <input id="myEmail" type="email" maxlength="254"
+                           placeholder="Enter your email..."
+                           aria-describedby="emailError"
+                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg pl-3 pr-20 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    <button id="emailSearchBtn" type="button"
+                            class="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-medium rounded-md bg-gray-200 text-gray-400 cursor-not-allowed"
+                            disabled>Search</button>
+                </div>
+            </div>
+
+            <!-- Project-type dropdown -->
+            <div class="relative sm:col-span-1" id="typeDropdownWrap">
+                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1" id="typeDropdownTriggerLabel">Filter by type</span>
+                <button type="button" id="typeTrigger"
+                        aria-expanded="false"
+                        aria-controls="typeDropdown"
+                        aria-haspopup="true"
+                        aria-labelledby="typeDropdownTriggerLabel typeLabel"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-left bg-white dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex justify-between items-center">
+                    <span id="typeLabel" class="truncate">All Project Types</span>
+                    <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div id="typeDropdown" class="dropdown-panel bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3" role="group" aria-labelledby="typeDropdownTriggerLabel">
+                    <ul class="space-y-2 list-none p-0 m-0">
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="Research" checked> Research
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="QI" checked> QI
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="Edu/Res" checked> Edu/Res
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="typeCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="Clin Trial" checked> Clin Trial
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="border-t pt-2 mt-1 flex gap-2 text-xs">
+                        <button type="button" id="typeSelectAll" class="text-blue-600 hover:underline">Select all</button>
+                        <span class="text-gray-300" aria-hidden="true">|</span>
+                        <button type="button" id="typeClearAll" class="text-blue-600 hover:underline">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter dropdown -->
+            <div class="relative sm:col-span-1" id="statusDropdownWrap">
+                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1" id="statusDropdownTriggerLabel">Filter by status</span>
+                <button type="button" id="statusTrigger"
+                        aria-expanded="false"
+                        aria-controls="statusDropdown"
+                        aria-haspopup="true"
+                        aria-labelledby="statusDropdownTriggerLabel statusLabel"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-left bg-white dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex justify-between items-center">
+                    <span id="statusLabel" class="truncate">Filter</span>
+                    <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div id="statusDropdown" class="dropdown-panel bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-3" role="group" aria-labelledby="statusDropdownTriggerLabel">
+                    <ul class="space-y-2 list-none p-0 m-0">
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="open" checked> Open
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="closed"> Full (no slots)
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="border-t border-dashed border-gray-300 my-1"></div>
+                    <ul class="space-y-2 list-none p-0 m-0">
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="upcoming"> Upcoming
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="completed"> Completed
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 px-1 rounded">
+                                <input type="checkbox" class="statusCheck h-4 w-4 text-blue-600 rounded border-gray-300" value="stale"> Stale
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="border-t pt-2 mt-1 flex gap-2 text-xs">
+                        <button type="button" id="statusSelectAll" class="text-blue-600 hover:underline">Select all</button>
+                        <span class="text-gray-300" aria-hidden="true">|</span>
+                        <button type="button" id="statusClearAll" class="text-blue-600 hover:underline">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sort by -->
+            <div class="sm:col-span-1">
+                <label for="sortSelect" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sort by...</label>
+                <select id="sortSelect"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    <option value="updated_desc">Most recent</option>
+                    <option value="slots_desc">Most slots</option>
+                    <option value="hours_asc">Fewest hours</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Live region for filter result announcements -->
+<div aria-live="polite" aria-atomic="true" class="sr-only" id="results-announcement"></div>
+
+<!-- ════════════════════ MAIN CONTENT ════════════════════ -->
+<div id="main-content" class="container mx-auto px-4 sm:px-6 py-4 flex-1">
+
+    <!-- Desktop table -->
+    <div class="hidden md:block table-card-wrap">
+        <table class="w-full table-fixed">
+            <colgroup>
+                <col class="col-project">
+                <col class="col-faculty">
+                <col class="col-trainees">
+                <col class="col-description">
+                <col class="col-slots">
+                <col class="col-action">
+            </colgroup>
+            <thead id="stickyThead" class="sticky z-[30]">
+            <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faculty</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trainees</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">At a glance</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Openings</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+            </tr>
+            </thead>
+            <tbody id="table-body-desktop" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+        </table>
+        <div id="no-results-desktop" class="hidden text-center p-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-lg">
+            <p class="text-lg font-semibold">No projects found</p>
+            <p class="text-sm">Try adjusting your search or filter criteria.</p>
+        </div>
+    </div>
+
+    <!-- Mobile cards -->
+    <div id="card-container" class="md:hidden space-y-3"></div>
+    <div id="no-results-mobile" class="hidden md:hidden text-center p-8 text-gray-500 dark:text-gray-400">
+        <p class="text-lg font-semibold">No projects found</p>
+        <p class="text-sm">Try adjusting your search or filter criteria.</p>
+    </div>
+</div>
+
+<footer class="mt-auto border-t border-gray-200 dark:border-gray-700">
+    <div class="container mx-auto px-4 sm:px-6 py-4 flex items-baseline justify-between text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-center flex-1">
+            Created by Brian Pitts, MD, MS, MEHP &middot; &copy; 2026 Brian Pitts. All rights reserved. &middot;
+            <button id="openDisclaimer" type="button"
+                    class="underline hover:text-gray-700 transition-colors">Disclaimer</button>
+        </div>
+        <span class="ml-4 whitespace-nowrap">v1.1</span>
+    </div>
+</footer>
+
+<!-- ════════════════════ MODAL ════════════════════ -->
+<div id="signupModal"
+     class="modal fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 flex items-center justify-center p-4 z-50"
+     role="dialog" aria-modal="true" aria-labelledby="modalProjectTitle">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl transform -translate-y-10 flex flex-col max-h-[90vh]">
+
+        <!-- Header -->
+        <div id="modalHeader" class="flex justify-between items-start p-4 sm:p-6 border-b dark:border-gray-700 gap-3">
+            <div class="min-w-0 flex-1">
+                <h2 id="modalTitle" class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Project Details</h2>
+                <p id="modalProjectTitle" class="text-sm text-blue-700 font-semibold mt-1 break-words"></p>
+
+                <div class="mt-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div class="flex flex-wrap gap-x-6 gap-y-1 items-center">
+                        <div>
+                            <span class="font-semibold">Sent to:</span>
+                            <span id="routeToName">Not listed</span>
+                            <span id="routeToEmailWrap" class="hidden">
+                &middot; <a id="routeToEmail" class="text-blue-700 hover:underline" href="#" target="_blank" rel="noreferrer"></a>
+              </span>
+                        </div>
+                        <div><span class="font-semibold">Expected response:</span> within 5 business days</div>
+
+                        <span id="staleBadgeDetail" class="hidden px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
+              Reviewing
+            </span>
+                        <span id="appliedBadgeDetail" class="hidden px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+              Applied
+            </span>
+                    </div>
+
+                    <div id="appliedInfoDetail" class="hidden text-xs text-gray-600 mt-1"></div>
+                    <div class="text-xs text-gray-500 mt-1">Demo: admin edits persist to localStorage; submissions last for this browser session only.</div>
+                </div>
+            </div>
+
+            <button id="closeModal" class="text-gray-400 hover:text-gray-800 text-3xl leading-none shrink-0" aria-label="Close modal">&times;</button>
+        </div>
+
+        <!-- DETAILS VIEW -->
+        <div id="projectDetailsView" class="modal-body overflow-y-auto p-4 sm:p-6 space-y-6">
+            <input type="hidden" id="projectTitleInput">
+
+            <div class="flex flex-wrap items-center gap-2">
+                <span id="badgeType" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">Type</span>
+                <span id="badgeStatus" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">Status</span>
+                <span id="badgeTime" class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700">Time</span>
+                <span id="badgeSlots" class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700">Openings</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="sm:col-span-2 space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 mb-1">Overview</h3>
+                        <p id="detailsDescription" class="text-sm text-gray-700 leading-relaxed"></p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900 mb-2">Timeline</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="rounded-lg border border-gray-200 p-3">
+                                <div class="text-xs uppercase tracking-wider text-gray-500">Duration</div>
+                                <div id="detailsDuration" class="text-sm font-medium text-gray-900">TBD</div>
+                            </div>
+                            <div class="rounded-lg border border-gray-200 p-3">
+                                <div class="text-xs uppercase tracking-wider text-gray-500">Target date</div>
+                                <div id="detailsTargetDate" class="text-sm font-medium text-gray-900">TBD</div>
+                            </div>
+                            <div class="rounded-lg border border-gray-200 p-3">
+                                <div class="text-xs uppercase tracking-wider text-gray-500">Last updated</div>
+                                <div id="detailsLastUpdated" class="text-sm font-medium text-gray-900">TBD</div>
+                            </div>
+                        </div>
+                        <p id="detailsStaleNote" class="hidden text-xs text-amber-700 mt-2">
+                            This listing hasn't been updated in over 120 days. Please confirm availability and scope before committing.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-1">
+                    <div class="rounded-lg border border-gray-200 p-4 space-y-3">
+                        <div>
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Faculty</div>
+                            <div id="detailsFaculty" class="text-sm font-medium text-gray-900"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Current trainees</div>
+                            <div id="detailsTrainees" class="text-sm text-gray-700"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Skills</div>
+                            <div id="detailsSkills" class="text-sm text-gray-700"></div>
+                        </div>
+
+                        <div class="border-t pt-3">
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Project contact</div>
+                            <div id="detailsContactName" class="text-sm font-medium text-gray-900">Not listed</div>
+                            <div id="detailsContactEmailWrap" class="text-sm mt-0.5 hidden">
+                                <a id="detailsContactEmail" class="text-blue-700 hover:underline" href="#" target="_blank" rel="noreferrer"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin panel (hidden unless ?admin=true) -->
+            <details id="adminPanel" class="border-t pt-4 hidden">
+                <summary class="cursor-pointer select-none text-sm font-semibold text-gray-800">
+                    Admin (demo): edit contact, timeline, slots
+                    <span class="text-gray-500 font-normal">— saved to localStorage</span>
+                </summary>
+
+                <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="adminContactName" class="block text-sm font-medium text-gray-700 mb-1">Contact name</label>
+                            <input id="adminContactName" maxlength="200" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label for="adminContactEmail" class="block text-sm font-medium text-gray-700 mb-1">Contact email</label>
+                            <input id="adminContactEmail" type="email" maxlength="254" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+
+                        <div>
+                            <label for="adminDurationRange" class="block text-sm font-medium text-gray-700 mb-1">Duration range</label>
+                            <input id="adminDurationRange" maxlength="200" autocomplete="off" placeholder="e.g., 8–12 weeks" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                        <div>
+                            <label for="adminTargetDate" class="block text-sm font-medium text-gray-700 mb-1">Target date</label>
+                            <input id="adminTargetDate" maxlength="200" autocomplete="off" placeholder="e.g., ASA Oct 2026 / 2026-09-01" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+
+                        <div>
+                            <label for="adminLastUpdated" class="block text-sm font-medium text-gray-700 mb-1">Last updated</label>
+                            <input id="adminLastUpdated" type="date" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <button type="button" id="adminSetToday" class="mt-2 text-xs text-blue-700 hover:underline">Set to today</button>
+                        </div>
+                        <div>
+                            <label for="adminStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="adminStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option>Active</option>
+                                <option>Planning</option>
+                                <option>Completed</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="adminTime" class="block text-sm font-medium text-gray-700 mb-1">Hours/week label</label>
+                            <input id="adminTime" maxlength="200" autocomplete="off" placeholder="e.g., 2–4 hrs/week / Flexible" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="adminStudentSlots" class="block text-sm font-medium text-gray-700 mb-1">MS slots</label>
+                                <input id="adminStudentSlots" type="number" min="0" max="99" step="1" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            </div>
+                            <div>
+                                <label for="adminResidentSlots" class="block text-sm font-medium text-gray-700 mb-1">Resident slots</label>
+                                <input id="adminResidentSlots" type="number" min="0" max="99" step="1" autocomplete="off" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-4">
+                        <button type="button" id="adminResetProject"
+                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors">
+                            Reset this project
+                        </button>
+                        <button type="button" id="adminSaveProject"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                            Save changes
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-500">
+                        Reset removes overrides from localStorage and restores the defaults embedded in the HTML.
+                    </p>
+                </div>
+            </details>
+
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-4">
+                <button type="button" id="detailsClose"
+                        class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors text-center">
+                    Back to list
+                </button>
+                <button type="button" id="goToInterest"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-center">
+                    Apply
+                </button>
+            </div>
+        </div>
+
+        <!-- FORM VIEW -->
+        <form id="signupForm" class="modal-body overflow-y-auto p-4 sm:p-6 space-y-6 hidden">
+            <div class="flex items-center justify-between border-b pb-3">
+                <button id="backToDetails" type="button" class="text-sm font-semibold text-blue-700 hover:underline">
+                    ← Back to details
+                </button>
+                <span class="text-xs text-gray-500">Project ID: <span id="formProjectId"></span></span>
+            </div>
+
+            <fieldset>
+                <legend class="text-lg font-semibold text-gray-900 mb-1">Apply (about 2 minutes)</legend>
+                <p class="text-sm text-gray-600 mb-4">This sends a short message to the project contact.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full name <span class="text-red-600">*</span></label>
+                        <input id="fullName" name="fullName" required maxlength="200"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-600">*</span></label>
+                        <input id="email" type="email" name="email" required maxlength="254"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <p class="text-xs text-gray-500 mt-1">After submit, this project will show as <span class="font-semibold">Applied</span> for this email on this device.</p>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="interestNote" class="block text-sm font-medium text-gray-700 mb-1">Short interest note <span class="text-red-600">*</span></label>
+                        <textarea id="interestNote" name="interestNote" required rows="4" maxlength="2000"
+                                  placeholder="In 3–5 sentences: why this project, relevant experience, and what you hope to learn or produce."
+                                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-4">
+                <button type="button" id="cancelButton"
+                        class="px-6 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 font-semibold rounded-lg transition-colors text-center">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-center">
+                    Send to project contact
+                </button>
+            </div>
+        </form>
+
+        <!-- Confirmation -->
+        <div id="confirmationView" class="hidden overflow-y-auto p-6 sm:p-10">
+            <div class="text-center py-8 sm:py-12">
+                <div class="confirm-icon mx-auto mb-6 w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="check-animated w-10 h-10 text-green-600" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Submitted!</h3>
+                <p id="confirmProjectName" class="text-blue-700 font-semibold text-sm mb-4"></p>
+
+                <p class="text-gray-600 max-w-md mx-auto mb-2">
+                    Your message was recorded and the project will now show as <span class="font-semibold">Applied</span> for your email on this device.
+                </p>
+                <p class="text-gray-500 text-sm max-w-md mx-auto mb-8">
+                    Expect a reply within 5 business days.
+                </p>
+
+                <button type="button" id="confirmClose"
+                        class="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                    Back to projects
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ════════════════════ DISCLAIMER MODAL ════════════════════ -->
+<div id="disclaimerModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50"
+     role="dialog" aria-modal="true" aria-labelledby="disclaimerTitle">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+        <button id="closeDisclaimerX" type="button"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
+                aria-label="Close disclaimer">&times;</button>
+        <h2 id="disclaimerTitle" class="text-lg font-bold text-gray-800 dark:text-white mb-4">Disclaimer</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            This website is for demonstration purposes only. It is an independent project
+            created and maintained by Brian Pitts and is not affiliated with, endorsed by,
+            or representative of UC Davis, UC Davis Health, or any other institution. All
+            information presented here is compiled from publicly available sources and may
+            not reflect current opportunities. While every effort is made to ensure accuracy,
+            no guarantee is provided. Users should verify details independently before making
+            decisions based on this content.
+        </p>
+        <div class="mt-5 text-right">
+            <button id="closeDisclaimerBtn" type="button"
+                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════ SCRIPTS ════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/shared-accessible.js"></script>
+<script src="js/init-accessible.js"></script>
+
+</body>
+</html>
