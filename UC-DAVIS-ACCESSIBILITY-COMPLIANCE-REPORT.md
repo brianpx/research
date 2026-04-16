@@ -190,12 +190,12 @@ All `for`/`id` pairs are unique on the page ✅
 
 #### Error Handling:
 ```html
-<!-- index-accessible.html:101 -->
+<!-- index.html:101 -->
 <span id="emailError" class="hidden text-xs text-red-600" role="alert">
     — Please enter a valid email address.
 </span>
 
-<!-- index-accessible.html:106 -->
+<!-- index.html:106 -->
 <input id="myEmail" type="email" aria-describedby="emailError" ...>
 ```
 - `role="alert"` provides assertive live region announcement ✅
@@ -209,7 +209,7 @@ All `for`/`id` pairs are unique on the page ✅
 
 #### Fieldset/Legend:
 ```html
-<!-- index-accessible.html:484–485 -->
+<!-- index.html:484–485 -->
 <fieldset>
     <legend class="text-lg font-semibold ...">Apply (about 2 minutes)</legend>
     ...
@@ -518,7 +518,7 @@ if (announcement) {
 **Status:** ✅ FULLY COMPLIANT
 
 ```html
-<!-- index-accessible.html:12 -->
+<!-- index.html:12 -->
 <html lang="en">
 ```
 
