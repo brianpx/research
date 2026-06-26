@@ -266,59 +266,7 @@ function unlockBodyScroll() {
 let projectData = [];
 let currentProjectId = null;
 let _modalTriggerEl = null;
-const selectedIds = new Set();
-let lastRenderedIds = [];
 let emailFilterActive = false;
-
-/* ─────────────────────────────────────────────────────────
-   Selection / export bar
-───────────────────────────────────────────────────────── */
-function toggleSelection(id) {
-    if (selectedIds.has(id)) { selectedIds.delete(id); }
-    else { selectedIds.add(id); }
-    syncExportBar();
-    syncCheckboxes();
-}
-
-function selectAllVisible() {
-    lastRenderedIds.forEach(id => selectedIds.add(id));
-    syncExportBar();
-    syncCheckboxes();
-}
-
-function clearSelection() {
-    selectedIds.clear();
-    syncExportBar();
-    syncCheckboxes();
-}
-
-function syncExportBar() {
-    const bar = document.getElementById('exportBar');
-    if (!bar) return;
-    const count = document.getElementById('selectedCount');
-    if (selectedIds.size > 0) {
-        bar.classList.remove('collapsed');
-        count.textContent = selectedIds.size + ' project' + (selectedIds.size === 1 ? '' : 's') + ' selected';
-    } else {
-        bar.classList.add('collapsed');
-    }
-}
-
-function syncCheckboxes() {
-    document.querySelectorAll('.select-checkbox').forEach(cb => {
-        cb.checked = selectedIds.has(Number(cb.dataset.id));
-    });
-    const headerCb = document.getElementById('selectAllDesktop');
-    if (!headerCb) return;
-    if (lastRenderedIds.length === 0) {
-        headerCb.checked = false;
-        headerCb.indeterminate = false;
-    } else {
-        const visibleSelected = lastRenderedIds.filter(id => selectedIds.has(id)).length;
-        headerCb.checked = visibleSelected === lastRenderedIds.length;
-        headerCb.indeterminate = visibleSelected > 0 && visibleSelected < lastRenderedIds.length;
-    }
-}
 
 /* ─────────────────────────────────────────────────────────
    DOM refs (resolved at parse time — scripts at end of body)
@@ -410,66 +358,8 @@ function setAll(cls, val) {
 }
 
 /* ─────────────────────────────────────────────────────────
-   CSV export
+   (CSV export feature removed — was never wired into the UI)
 ───────────────────────────────────────────────────────── */
-function csvEscape(value) {
-    if (value == null) return '';
-    let str = String(value);
-    // Prevent CSV formula injection in spreadsheet applications
-    if (/^[=+\-@\t\r|]/.test(str)) {
-        str = "'" + str;
-    }
-    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r') || str.includes("'")) {
-        return '"' + str.replace(/"/g, '""') + '"';
-    }
-    return str;
-}
-
-function generateCsv(projects) {
-    const headers = [
-        'id','title','faculty','trainees','type','description','skills','time',
-        'status','durationRange','targetDate','lastUpdated','staleOver120Days',
-        'studentSlots','residentSlots','totalOpenings','contactName','contactEmail'
-    ];
-    const rows = projects.map(p => [
-        p.id, p.title, p.faculty, p.trainees, p.type, p.description, p.skills, p.time,
-        p.status, p.durationRange, p.targetDate, p.lastUpdated, isStale(p) ? 'Yes' : 'No',
-        Number(p.studentSlots) || 0, Number(p.residentSlots) || 0, totalOpenings(p),
-        p.contactName || '', p.contactEmail || ''
-    ]);
-    return headers.join(',') + '\n' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
-}
-
-function downloadCsv(content, filename) {
-    const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function csvFilename() {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `anes-research-opportunities_${yyyy}-${mm}-${dd}.csv`;
-}
-
-function downloadSelectedCsv() {
-    const selected = projectData.filter(p => selectedIds.has(p.id));
-    if (!selected.length) return;
-    downloadCsv(generateCsv(selected), csvFilename());
-}
-
-function downloadAllCsv() {
-    if (!projectData.length) return;
-    downloadCsv(generateCsv(projectData), csvFilename());
-}
 
 /* ─────────────────────────────────────────────────────────
    Views
@@ -727,7 +617,6 @@ function renderAll(data) {
     cardContainer.innerHTML = "";
 
     if (!data.length) {
-        lastRenderedIds = [];
         const msg = emailFilterActive
             ? "No applications found for this email."
             : "Try adjusting your search or filter criteria.";
@@ -735,16 +624,11 @@ function renderAll(data) {
         noMobile.querySelector("p:last-child").textContent = msg;
         noDesktop.classList.remove("hidden");
         noMobile.classList.remove("hidden");
-        syncExportBar();
-        syncCheckboxes();
         return;
     }
     noDesktop.classList.add("hidden");
     noMobile.classList.add("hidden");
 
-    lastRenderedIds = data.map(p => p.id);
-
-    const hasExportBar = !!document.getElementById('exportBar');
     const currentEmail = getCurrentApplicantEmail();
 
     // ACCESSIBILITY FIX: Create list wrapper for mobile cards
@@ -782,9 +666,6 @@ function renderAll(data) {
         row.dataset.projectId = p.id;
 
         row.innerHTML = `
-      ${hasExportBar ? `<td class="px-2 py-3 text-center align-top select-cell">
-        <input type="checkbox" class="select-checkbox h-4 w-4 text-blue-600 rounded border-gray-300" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(p.title)}">
-      </td>` : ''}
       <td class="px-4 py-3 align-top overflow-hidden">
         <div class="text-sm font-semibold ${muted ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'} clamp-2 break-words">${escapeHtml(p.title)}</div>
         <div class="flex items-center flex-wrap gap-x-1 gap-y-0.5 mt-0.5">
@@ -824,7 +705,6 @@ function renderAll(data) {
         card.className = `bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 ${muted ? 'opacity-60' : ''} ${notAvailable ? 'opacity-70' : ''}`;
         card.innerHTML = `
       <div class="flex items-start justify-between gap-3 mb-2">
-        ${hasExportBar ? `<input type="checkbox" class="select-checkbox h-4 w-4 mt-1 text-blue-600 rounded border-gray-300 shrink-0" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(p.title)}">` : ''}
         <button class="text-left flex-1 card-title-btn" type="button" data-id="${p.id}">
           <h3 class="text-sm font-semibold ${muted ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'} leading-snug">${escapeHtml(p.title)}</h3>
           <div class="text-xs text-blue-600 mt-1">View details</div>
@@ -861,9 +741,6 @@ function renderAll(data) {
 
     // Append mobile list to container
     cardContainer.appendChild(mobileList);
-
-    syncExportBar();
-    syncCheckboxes();
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -881,7 +758,6 @@ function initEventDelegation() {
             }
             return;
         }
-        if (e.target.closest('.select-cell')) return;
         const row = e.target.closest('tr.row-clickable');
         if (row) openModalWithProject(Number(row.dataset.projectId));
     });
@@ -889,15 +765,8 @@ function initEventDelegation() {
     // Desktop table body — keyboard
     tableBodyDesktop.addEventListener('keydown', (e) => {
         if (e.key !== 'Enter') return;
-        if (e.target.closest('.select-cell')) return;
         const row = e.target.closest('tr.row-clickable');
         if (row) openModalWithProject(Number(row.dataset.projectId));
-    });
-
-    // Desktop table body — checkbox change
-    tableBodyDesktop.addEventListener('change', (e) => {
-        const cb = e.target.closest('.select-checkbox');
-        if (cb) toggleSelection(Number(cb.dataset.id));
     });
 
     // Card container — click
@@ -915,11 +784,5 @@ function initEventDelegation() {
             openModalWithProject(Number(titleBtn.dataset.id));
             return;
         }
-    });
-
-    // Card container — checkbox change
-    cardContainer.addEventListener('change', (e) => {
-        const cb = e.target.closest('.select-checkbox');
-        if (cb) toggleSelection(Number(cb.dataset.id));
     });
 }

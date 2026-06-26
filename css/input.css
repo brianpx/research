@@ -73,19 +73,6 @@
         background-color: #dbeafe;
     }
 
-    .select-cell { cursor: default; }
-
-    .export-bar {
-        max-height: 80px;
-        opacity: 1;
-        transition: max-height 0.3s ease, opacity 0.2s ease;
-    }
-    .export-bar.collapsed {
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
-    }
-
     /* Table card wrapper */
     .table-card-wrap {
         position: relative;
